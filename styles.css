@@ -581,6 +581,10 @@ video {
   height: 14rem;
 }
 
+.h-full {
+  height: 100%;
+}
+
 .w-56 {
   width: 14rem;
 }
@@ -654,6 +658,14 @@ video {
   padding-top: 1rem;
 }
 
+.pt-0 {
+  padding-top: 0px;
+}
+
+.pt-3 {
+  padding-top: 0.75rem;
+}
+
 .text-xl {
   font-size: 1.25rem;
   line-height: 1.75rem;
@@ -690,5 +702,13 @@ video {
   .sm\:px-5 {
     padding-left: 1.25rem;
     padding-right: 1.25rem;
+  }
+
+  .sm\:pt-6 {
+    padding-top: 1.5rem;
+  }
+
+  .sm\:pt-0 {
+    padding-top: 0px;
   }
 }
