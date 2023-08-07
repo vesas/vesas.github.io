@@ -1,1 +1,299 @@
-hello world
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Personal web page for Vesa Saarinen, software developer from Finland.">
+  <link href="./styles.css" rel="stylesheet">
+</head>
+<body class="bg-slate-800 text-white">
+
+	<div class="container mx-auto">
+
+    <div class="flex flex-row place-content-between py-4">
+
+        <p class="text-xl py-2">
+            Hi, I'm Vesa, a software developer from Finland. 
+        </p>
+
+        <div class="flex flex-row ">
+            <div class="px-2">
+                <a href="https://github.com/vesas" target="_blank">
+                <svg class="fill-slate-300" width="32px" height="32px" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>GitHub</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a></div>
+            <div class="px-2">
+                <a href="https://www.linkedin.com/in/vesamsaarinen/" target="_blank">
+                <svg class="fill-slate-300" width="32px" height="32px" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>LinkedIn</title><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+<div class="py-2">
+  <h2 class="text-xl py-2">Projects</h2>
+    <p>Personal projects to learn and explore ideas.</p>
+</div>
+
+  <div class="flex flex-col space-y-6 pt-4">
+    
+    <div class="flex flex-row">
+        
+        <img class="h-full w-56" src="img/omastop_ss.png"/>
+        
+        <div class="px-5 text-slate-400">
+            <h2 class="text-slate-50 text-xl pb-3">Omastoppi.fi</h2>
+
+            <p class="pb-2">
+            Minimal application for answering one question: When is my bus going? Data fetched realtime from the HSL GraphQL API.
+            </p>
+
+            <div class="py-1">
+            <span class="text-slate-50">Why:</span> Learn React/Next.js, and create a simple application which could be used quickly when on the go on the HSL region.
+            </div>
+
+            <div class="py-1">
+                <span class="text-slate-50">Live:</span> <a href="https://www.omastoppi.fi/" target="_blank">https://www.omastoppi.fi/</a>
+            </div>
+
+            <div class="py-1">
+                <span class="text-slate-50">Github:</span> <a href="https://github.com/vesas/nextjs-omastoppi" target="_blank">https://github.com/vesas/nextjs-omastoppi</a>
+            </div>
+
+            <div class="py-1">
+                <span class="text-slate-50">Tech:</span> Typescript, React/Next.js, Tailwind CSS, GraphQL, Vercel
+            </div>
+        </div>
+
+        
+    </div>
+    <hr class="border-slate-700"/>
+        
+    <div class="flex flex-row">
+        
+        <img class="h-full w-56" src="img/econstats_ss.png" />
+        
+		<div class="px-5 text-slate-400">
+            <h2 class="text-white text-xl pb-3">Econstats.eu</h2>
+
+            <p class="pb-2">
+			Application which charts the major macroeconomic indicators for the EU and US areas. Data is fetched every day from the Eurostat and FRED APIs.
+            </p>
+
+            <div class="py-1">
+                <span class="text-slate-50">Why:</span> Learn more about AWS services.
+            </div>
+
+            <div class="py-1">
+                <span class="text-slate-50">Live:</span> <a href="https://econstats.eu" target="_blank">https://econstats.eu</a>
+            </div>
+
+            <div class="py-1">
+                <span class="text-slate-50">Architecture:</span> <a href="https://econstats.eu/architecture" target="_blank">https://econstats.eu/architecture</a>
+            </div>
+
+			<div class="py-2">
+                <span class="text-slate-50">Tech:</span> Python, AWS Lambda, AWS S3, AWS DynamoDB, AWS API Gateway, AWS Cloudformation
+			</div>
+		</div>
+
+
+    </div>
+    <hr class="border-slate-700"/>
+
+    <div class="relative flex w-full max-w-[64rem] flex-row">
+
+        <img class="h-full w-56" src="img/wfc_ss.png" />
+        
+		<div class="px-5 text-slate-400">
+            <h2 class="text-white text-xl pb-3">WFC generator</h2>
+
+            <p class="pb-2">
+			In game development WFC (Wave Function Collapse) is used for generating random output based on a set of tiles and rules. This output can then be used for different purposes, like level or texture generation. 
+			Here I'm creating textures. 
+			This is a simple Java implementation of Wave Function Collapse algorithm where the rules are defined in code. 
+            </p>
+
+            <div class="py-2">
+                <span class="text-slate-50">Why:</span> Complex result from simple rules.
+            </div>
+
+			<span class="text-slate-50">Github:</span> <a href="https://github.com/vesas/simple-wfc" target="_blank">https://github.com/vesas/simple-wfc</a>
+
+			<div class="py-2">
+                <span class="text-slate-50">Tech:</span> Java, LibGDX, Gradle
+			</div>
+		</div>
+    </div>
+    <hr class="border-slate-700"/>
+
+    <div class="relative flex w-full max-w-[64rem] flex-row">
+
+        <img class="h-full w-56" src="img/spacefly_ss.png" />
+        
+        <div class="px-5 text-slate-400">
+            <h2 class="text-white text-xl pb-3">Spacefly</h2>
+
+            <p class="pb-2">2D game with procedural level generation and dynamic area of sight calculation</p>
+
+		    <div class="py-2">
+                <span class="text-slate-50">Github:</span> <a href="https://github.com/vesas/spacefly" target="_blank">https://github.com/vesas/spacefly</a>
+            </div>
+
+			<div class="py-2">
+                <span class="text-slate-50">Tech:</span> Java, LibGDX, Gradle
+			</div>
+		</div>
+
+    </div>
+    <hr class="border-slate-700"/>
+
+    <div class="flex flex-row">
+        
+        <img class="h-full w-56" src="img/javarays_ss.png"/>
+        
+        <div class="px-5 text-slate-400">
+            <h2 class="text-slate-50 text-xl pb-3">Javarays</h2>
+
+            <p class="pb-2">
+            Raytracer in Java.
+
+            <div class="py-1">
+            <span class="text-slate-50">Why:</span> Explore performance ideas.
+            </div>
+
+            </p>
+
+            <div class="py-1">
+                <span class="text-slate-50">Tech:</span> Java
+            </div>
+        </div>
+
+        
+    </div>
+    <hr class="border-slate-700"/>
+
+    <div class="flex flex-row">
+        
+        <img class="h-full w-56" src="img/snakeray_ss.png"/>
+        
+        <div class="px-5 text-slate-400">
+            <h2 class="text-slate-50 text-xl pb-3">Snakeray</h2>
+
+            <p class="pb-2">
+            Multiprocessed raytracer in Python.
+
+            <div class="py-1">
+            <span class="text-slate-50">Why:</span> Explore performance ideas, practise python.
+            </div>
+
+            </p>
+
+            <div class="py-1">
+                <span class="text-slate-50">Github:</span> <a href="https://github.com/vesas//snake-ray" target="_blank">https://github.com/vesas/snake-ray</a>
+            </div>
+
+            <div class="py-1">
+                <span class="text-slate-50">Tech:</span> Python, PyPy
+            </div>
+        </div>
+
+        
+    </div>
+    <hr class="border-slate-700"/>
+
+    <div class="flex flex-row">
+
+        <img class="h-full w-56" src="img/ames_ss.png"/>
+
+        <div class="px-5 text-slate-400">
+            <h2 class="text-white text-xl pb-3">House price prediction using machine learning</h2>
+
+            <div class="py-1">
+                <span class="text-slate-50">Github:</span> <a href="https://github.com/vesas/ames_house_prices" target="_blank">https://github.com/vesas/ames_house_prices</a>
+            </div>
+
+            <div class="py-1">
+                <span class="text-slate-50">Tech:</span> Python, Pandas, Numpy, Scikit-learn, Seaborn
+            </div>
+		</div>
+    </div>
+
+    <hr class="border-slate-700"/>
+
+    <div class="flex flex-row">
+        
+        <img class="h-full w-56" src="img/lightseek_ss.png"/>
+
+        <div class="px-5 text-slate-400">
+            <h2 class="text-white text-xl pb-3">Sunrise & sunset for Android phones</h2>
+		    <p class="pb-2"">
+            Local sunset and sunrise times.
+            </p>
+
+            <div class="py-2">
+                <span class="text-slate-50">Live:</span> <a href="https://play.google.com/store/apps/details?id=com.lentil.sunseeker" target="_blank">Google Play</a>
+            </div>
+        
+		<div class="py-2">
+            <span class="text-slate-50">Tech:</span> Java, Android SDK
+		</div>
+		
+		</div>
+
+    </div>
+    <hr class="border-slate-700"/>
+
+    <div class="flex flex-row">
+        
+        <img class="h-full w-56" src="img/livewp_ss.png"/>
+
+        <div class="px-5 text-slate-400">
+            <h2 class="text-white text-xl pb-3">Live wallpaper for Android phones</h2>
+		    <p class="pb-2">
+            Animated wallpaper for Android with minimal battery usage.
+            </p>
+
+            <div class="py-2">
+                <span class="text-slate-50">Live:</span> <a href="https://play.google.com/store/apps/details?id=com.lentilsoft.lbwp.android" target="_blank">Google Play</a>
+            </div>
+        
+		<div class="py-2">
+            <span class="text-slate-50">Tech:</span> Java, Android SDK
+		</div>
+		
+		</div>
+
+    </div>
+    <hr class="border-slate-700"/>
+
+
+    <div class="flex flex-row">
+        
+        <img class="h-full w-56" src="img/colortact_ss.png"/>
+
+        <div class="px-5 text-slate-400">
+            <h2 class="text-white text-xl pb-3">Colortact game for Android phones</h2>
+		    <p class="pb-2">
+                Game of connecting same colored items
+            </p>
+
+            <div class="py-2">
+                <span class="text-slate-50">Live:</span> <a href="https://play.google.com/store/apps/details?id=com.lentilsoft.colortact.android" target="_blank">Google Play</a>
+            </div>
+        
+		<div class="py-2">
+            <span class="text-slate-50">Tech:</span> Java, Android SDK
+		</div>
+		
+		</div>
+
+    </div>
+    <hr class="border-slate-700"/>
+
+  </div>
+
+</div>
+</body>
+</html>
+
