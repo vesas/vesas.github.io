@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vesa Saarinen, Software developer, Portfolio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Personal web page for Vesa Saarinen, software developer from Finland.">
+  <link href="./../styles.css" rel="stylesheet">
+  <style>
+    /* Target Shiki-generated pre and code tags for font size adjustment */
+    pre.shiki,
+    pre.shiki code {
+      font-size: 0.875rem; /* Equivalent to Tailwind's text-sm, or 14px if base is 16px */
+      /* You might want to adjust line-height as well if needed, e.g.:
+      line-height: 1.25rem; 
+      */
+    }
+  </style>
+</head>
+
+<body class="bg-slate-800 text-gray-100 px-2">
+
+	<div class="container mx-auto">
+
+        <h2 class="text-xl font-bold mb-2 p-6">Automatic Cobol translation to Java</h2>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-gray-800 rounded-lg p-2">
+                <h2 class="text-xl font-bold mb-2">Cobol</h2>
+                <pre class="code-block"><code class="language-cobol" id="cobol-code-block">
+IDENTIFICATION DIVISION.
+PROGRAM-ID.  Move3.
+DATA DIVISION.
+WORKING-STORAGE SECTION.
+
+    01  INVOICE.
+    05 INVOICE-LINE.
+        15  INV-LINE-ITEM-COUNT      PIC S9(05) COMP-3.
+    05 INVOICE-LINE2.
+        15  INV-LINE-ITEM-COUNT      PIC S9(05) COMP-3.
+
+
+PROCEDURE DIVISION.
+MainSection SECTION.
+    MOVE 3 TO INV-LINE-ITEM-COUNT IN INVOICE-LINE.
+    MOVE INV-LINE-ITEM-COUNT IN INVOICE-LINE TO INV-LINE-ITEM-COUNT IN INVOICE-LINE2.
+    DISPLAY INV-LINE-ITEM-COUNT IN INVOICE-LINE2.
+    STOP RUN.
+                    
+                </code></pre>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg p-2">
+                <h2 class="text-xl font-bold mb-2">Java</h2>
+                <pre class="code-block"><code class="language-java" id="java-code-block">  
+package fi.vesas.nnn;
+
+import org.apache.commons.lang3.StringUtils;
+
+public class Move3 {
+    public class InvoiceType {
+        public class InvoiceLineType {
+            public int invLineItemCount;
+            public int getInvLineItemCount() { return invLineItemCount; }
+            public void setInvLineItemCount(int value) { invLineItemCount = value; }
+
+        }
+        private InvoiceLineType invoiceLine = new InvoiceLineType();
+
+        public InvoiceLineType getInvoiceLine() {
+            return invoiceLine;
+        }
+
+        public class InvoiceLine2Type {
+            public int invLineItemCount;
+            public int getInvLineItemCount() { return invLineItemCount; }
+            public void setInvLineItemCount(int value) { invLineItemCount = value; }
+
+        }
+        private InvoiceLine2Type invoiceLine2 = new InvoiceLine2Type();
+
+        public InvoiceLine2Type getInvoiceLine2() {
+            return invoiceLine2;
+        }
+
+    }
+    private InvoiceType invoice = new InvoiceType();
+
+
+    public InvoiceType getInvoice() {
+        return invoice;
+    }
+
+
+    public void mainsection() {
+        getInvoice().getInvoiceLine().setInvLineItemCount(3);
+        getInvoice().getInvoiceLine2().setInvLineItemCount(getInvoice().getInvoiceLine().getInvLineItemCount());
+        System.out.println(getInvoice().getInvoiceLine2().getInvLineItemCount());
+
+    }
+}
+                </code></pre>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module">
+      // Using esm.sh CDN for Shiki, specifying a version is good practice.
+      // Make sure to use a version that is compatible with client-side usage.
+      // As of my last update, Shiki v1.x series supports this well.
+      // Check shiki.matsu.io for the latest versions and CDN usage.
+      import { codeToHtml } from 'https://esm.sh/shiki@1.0.0'; // Example version, adjust if needed
+
+      async function highlightElement(elementId, language, theme) {
+        const codeElement = document.getElementById(elementId);
+        if (codeElement) {
+          // Trim the code to remove leading/trailing whitespace that might interfere.
+          const rawCode = (codeElement.textContent || codeElement.innerText || '').trim();
+          if (!rawCode) {
+            console.warn(`Shiki: No code content found for ID '${elementId}'.`);
+            return;
+          }
+          try {
+            const html = await codeToHtml(rawCode, {
+              lang: language,
+              theme: theme
+            });
+            const preElement = codeElement.parentElement;
+            if (preElement && preElement.tagName === 'PRE') {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html; // html from codeToHtml is a full <pre>...</pre> string
+                if (tempDiv.firstChild) {
+                    preElement.parentNode.replaceChild(tempDiv.firstChild, preElement);
+                } else {
+                    console.error(`Shiki: Could not parse generated HTML for ID '${elementId}'.`);
+                }
+            } else {
+                console.error(`Shiki: Parent <pre> element not found for ID '${elementId}'.`);
+            }
+          } catch (error) {
+            console.error(`Error highlighting ${language} code with Shiki for ID ${elementId}:`, error);
+          }
+        } else {
+          console.warn(`Shiki: Element with ID '${elementId}' not found.`);
+        }
+      }
+
+      async function highlightAllCodeBlocks() {
+        // Highlight Java code
+        await highlightElement('java-code-block', 'java', 'vitesse-dark');
+        // Highlight COBOL code
+        await highlightElement('cobol-code-block', 'cobol', 'vitesse-dark');
+      }
+
+      // Run the highlighting function when the DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', highlightAllCodeBlocks);
+      } else {
+        highlightAllCodeBlocks();
+      }
+    </script>
+</body>
+</html>
+
