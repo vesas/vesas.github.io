@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vesa Saarinen, Software developer, Portfolio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Personal web page for Vesa Saarinen, software developer from Finland.">
+  <link href="./../styles.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/monokai-sublime.min.css">
+</head>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+
+<!-- and it's easy to individually load additional languages -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/java.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/cobol.min.js"></script>
+
+<style>
+    /* Override highlight.js default background */
+    .hljs {
+        background: transparent !important;
+        padding: 0 !important;
+    }
+    /* Make sure the pre element doesn't add extra background */
+    pre {
+        background: #2a2a2a !important; /* Slightly lighter than the container */
+        margin: 0 !important;
+        padding: 1rem !important;
+        border-radius: 0.375rem !important; /* rounded-md equivalent */
+    }
+</style>
+
+<script>hljs.highlightAll();</script>
+
+<body class="bg-slate-800 text-gray-100 px-2">
+
+	<div class="container mx-auto">
+
+        <h2 class="text-xl font-bold mb-2 p-2">Automatic Cobol translation to Java</h2>
+        <h3 class="text-xl font-bold mb-2 p-2">Occurs example 1</h3>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-gray-800 rounded-lg p-2">
+                <h2 class="text-xl font-bold mb-2">Cobol</h2>
+                <pre><code class="language-x">
+IDENTIFICATION DIVISION.
+PROGRAM-ID. OCCURS-EXAMPLE.
+
+ENVIRONMENT DIVISION.
+DATA DIVISION.
+WORKING-STORAGE SECTION.
+01 NAME-TABLE.
+  05 NAME-ENTRY OCCURS 2 TIMES.
+	 10 FIRST-NAME    PIC X(10).
+	 10 LAST-NAME     PIC X(15).
+01 COUNTER            PIC 9(2).
+
+PROCEDURE DIVISION.
+MAIN-PROCEDURE.
+   *> Initialize the name table
+   MOVE "John" TO FIRST-NAME(1)
+   MOVE "Smith" TO LAST-NAME(1)
+   MOVE "Mary" TO FIRST-NAME(2)
+   MOVE "Johnson" TO LAST-NAME(2)
+   
+   *> Display all names using a loop
+   DISPLAY "List of Names:"
+   PERFORM VARYING COUNTER FROM 1 BY 1 UNTIL COUNTER > 2
+	   DISPLAY COUNTER ": " FIRST-NAME(COUNTER) " " LAST-NAME(COUNTER)
+   END-PERFORM
+   
+   STOP RUN. 
+                    
+                </code></pre>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg p-2">
+                <h2 class="text-xl font-bold mb-2">Java</h2>
+                <pre><code class="language-java">  
+package fi.vesas.nnn;
+
+
+public class OCCURS_EXAMPLE {
+    public class NameTableType {
+        public class NameEntryType {
+            private String firstName;
+            public String getFirstName() { return firstName; }
+            public void setFirstName(String value) { firstName = value; }
+
+            private String lastName;
+            public String getLastName() { return lastName; }
+            public void setLastName(String value) { lastName = value; }
+
+        }
+        private NameEntryType[] nameEntry = new NameEntryType[2];
+
+        public NameEntryType getNameEntry(final int idx) {
+            if(nameEntry[idx] == null) {
+                nameEntry[idx] = new NameEntryType();
+            }
+            return nameEntry[idx];
+        }
+
+
+    }
+    private NameTableType nameTable = new NameTableType();
+
+    public NameTableType getNameTable() {
+        return nameTable;
+    }
+    private int counter;
+    public int getCounter() { return counter; }
+    public void setCounter(int value) { counter = value; }
+
+
+    private void mainProcedure() {
+        getNameTable().getNameEntry(0).setFirstName("John");
+        getNameTable().getNameEntry(0).setLastName("Smith");
+        getNameTable().getNameEntry(1).setFirstName("Mary");
+        getNameTable().getNameEntry(1).setLastName("Johnson");
+        for(setCounter(1) ;!(getCounter() > 2); setCounter(getCounter() + 1)) {
+            System.out.println(getCounter() + ": " + getNameTable().getNameEntry(counter - 1).getFirstName() + " " + getNameTable().getNameEntry(counter - 1).getLastName());
+
+        }
+        // STOP RUN
+
+    }
+
+    public void main() {
+        mainProcedure();
+    }
+	
+	public static void main(String [] args) {
+        OCCURS_EXAMPLE instance = new OCCURS_EXAMPLE();
+        instance.main();
+    }
+}
+                </code></pre>
+            </div>
+        </div>
+
+		<h3 class="text-xl font-bold mb-2 p-2">Comparing the results of running the code:</h3>		
+		
+		<div class="grid grid-cols-2 gap-4">
+            <div class="bg-gray-800 rounded-lg p-2">
+                <h2 class="text-xl font-bold mb-2">Cobol execution</h2>
+                <pre><code class="language-x">
+List of Names:
+01: John       Smith          
+02: Mary       Johnson
+				</code></pre>
+            </div>
+			<div class="bg-gray-800 rounded-lg p-2">
+                <h2 class="text-xl font-bold mb-2">Java execution</h2>
+                <pre><code class="language-x">
+List of Names:
+1: John Smith
+2: Mary Johnson
+				</code></pre>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
+
