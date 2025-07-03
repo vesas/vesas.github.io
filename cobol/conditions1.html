@@ -39,11 +39,11 @@
         <h2 class="text-xl font-bold mb-2 p-2">Automatic Cobol translation to Java</h2>
         <h3 class="text-xl font-bold mb-2 p-2">Conditions example</h3>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="">
             <div class="bg-gray-800 rounded-lg p-2">
                 <h2 class="text-xl font-bold mb-2">Cobol</h2>
-                <pre><code class="language-x">
-IDENTIFICATION DIVISION.
+                <pre>
+<code class="language-x">IDENTIFICATION DIVISION.
 PROGRAM-ID.  If5.
 DATA DIVISION.
 WORKING-STORAGE SECTION.
@@ -53,7 +53,7 @@ WORKING-STORAGE SECTION.
 
 PROCEDURE DIVISION.
 MainSection SECTION.
-           IF CUSTOMER-NAME = 'X' OR 'Y' OR 'Z'
+	   IF CUSTOMER-NAME = 'X' OR 'Y' OR 'Z'
          CONTINUE
        END-IF.
        IF CUSTOMER-NAME = 'X' OR CUSTOMER-NAME = 'Y' AND CUSTOMER-NAME = 'Z'
@@ -74,16 +74,12 @@ MainSection SECTION.
          CONTINUE
        END-IF.
 
-    STOP RUN.
-                    
-                </code></pre>
+    STOP RUN.</code></pre>
             </div>
 
             <div class="bg-gray-800 rounded-lg p-2">
                 <h2 class="text-xl font-bold mb-2">Java</h2>
-                <pre><code class="language-java">  
-package fi.vesas.nnn;
-
+                <pre><code class="language-java">package fi.vesas.nnn;
 
 public class If5 {
     private String customerName = "JOHN DOE";
