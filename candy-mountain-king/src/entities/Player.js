@@ -10,6 +10,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.body.setSize(24, 24);
     this.setCollideWorldBounds(true);
     this.candyCount = 0;
+    this.meatCount = 0;
 
     this._keys = scene.input.keyboard.addKeys({
       up:    Phaser.Input.Keyboard.KeyCodes.UP,
@@ -54,5 +55,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       yoyo: true,
       ease: 'Quad.easeOut',
     });
+  }
+
+  catchAnimal() {
+    this.meatCount++;
+    this.scene.events.emit('animalCaught', this.meatCount);
   }
 }

@@ -1,4 +1,4 @@
-import { MAP_WIDTH, MAP_HEIGHT, ZONE, CANDY_COUNT, VILLAGER_COUNT, THIEF_COUNT } from '../constants.js';
+import { MAP_WIDTH, MAP_HEIGHT, ZONE, CANDY_COUNT, VILLAGER_COUNT, THIEF_COUNT, ANIMAL_COUNT } from '../constants.js';
 import { TileType } from './TileTypes.js';
 
 export function generateWorld(seed = 1) {
@@ -19,9 +19,34 @@ export function generateWorld(seed = 1) {
       else if (d < ZONE.MOUNTAIN_PEAK_OUTER) type = TileType.MOUNTAIN_PEAK;
       else if (d < ZONE.MOUNTAIN_BASE_OUTER) type = TileType.MOUNTAIN_BASE;
       else if (d < ZONE.FIELDS_OUTER)        type = TileType.FIELDS;
-      else                                   type = TileType.PLAINS;
+      else {
+        // Outer plains: scatter forests and rocks with noise
+        const forestNoise = Math.sin(tx * 0.3 + seed * 2) * Math.cos(ty * 0.3 + seed * 0.7);
+        const rockNoise   = Math.sin(tx * 1.2 + seed * 3.1) * Math.cos(ty * 1.4 + seed * 1.5);
+        if      (rockNoise   > 0.80) type = TileType.ROCKS;
+        else if (forestNoise > 0.45) type = TileType.FOREST;
+        else                         type = TileType.PLAINS;
+      }
 
       tileData[ty * MAP_WIDTH + tx] = type;
+    }
+  }
+
+  // Guarantee a passage south through the mountain peak ring so the player
+  // (who spawns south of the house) can always exit to the plains.
+  // Radius range 4–10 covers the peak zone even with max noise distortion.
+  for (let r = 4; r <= 10; r++) {
+    for (let w = -1; w <= 1; w++) {
+      // south direction: angle = PI/2 → (cos=0, sin=1)
+      // perpendicular (east/west): w offset on the x axis
+      const tx = Math.round(cx + w);
+      const ty = Math.round(cy + r);
+      if (tx >= 0 && tx < MAP_WIDTH && ty >= 0 && ty < MAP_HEIGHT) {
+        const idx = ty * MAP_WIDTH + tx;
+        if (tileData[idx] === TileType.MOUNTAIN_PEAK) {
+          tileData[idx] = TileType.MOUNTAIN_BASE;
+        }
+      }
     }
   }
 
@@ -45,14 +70,14 @@ export function generateWorld(seed = 1) {
     return null;
   }
 
-  // Candy: PLAINS or FIELDS, dist > 12
+  // Candy: PLAINS, FIELDS, or FOREST, dist > 12
   const candyPositions = [];
   for (let i = 0; i < CANDY_COUNT; i++) {
     const spot = findSpot((tx, ty) => {
       const t = tileAt(tx, ty);
       const dx = tx - cx; const dy = ty - cy;
       const d = Math.sqrt(dx*dx + dy*dy);
-      return (t === TileType.PLAINS || t === TileType.FIELDS) && d > 12;
+      return (t === TileType.PLAINS || t === TileType.FIELDS || t === TileType.FOREST) && d > 12;
     });
     if (spot) candyPositions.push(spot);
   }
@@ -64,16 +89,29 @@ export function generateWorld(seed = 1) {
     if (spot) villagerSpawns.push(spot);
   }
 
-  // Thieves: PLAINS, dist > 26
+  // Thieves: PLAINS or FOREST, dist > 26
   const thiefSpawns = [];
   for (let i = 0; i < THIEF_COUNT; i++) {
     const spot = findSpot((tx, ty) => {
       const dx = tx - cx; const dy = ty - cy;
       const d = Math.sqrt(dx*dx + dy*dy);
-      return tileAt(tx, ty) === TileType.PLAINS && d > ZONE.THIEF_MIN_DIST;
+      const t = tileAt(tx, ty);
+      return (t === TileType.PLAINS || t === TileType.FOREST) && d > ZONE.THIEF_MIN_DIST;
     });
     if (spot) thiefSpawns.push(spot);
   }
 
-  return { tileData, candyPositions, villagerSpawns, thiefSpawns };
+  // Animals: PLAINS or FOREST, dist > 20
+  const animalSpawns = [];
+  for (let i = 0; i < ANIMAL_COUNT; i++) {
+    const spot = findSpot((tx, ty) => {
+      const dx = tx - cx; const dy = ty - cy;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      const t = tileAt(tx, ty);
+      return (t === TileType.PLAINS || t === TileType.FOREST) && d > 20;
+    });
+    if (spot) animalSpawns.push(spot);
+  }
+
+  return { tileData, candyPositions, villagerSpawns, thiefSpawns, animalSpawns };
 }

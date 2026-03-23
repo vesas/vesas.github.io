@@ -17,3 +17,4 @@ export const ZONE = {
 export const CANDY_COUNT = 40;
 export const VILLAGER_COUNT = 8;
 export const THIEF_COUNT = 6;
+export const ANIMAL_COUNT = 10;

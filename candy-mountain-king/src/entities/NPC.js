@@ -14,7 +14,7 @@ export default class NPC extends Phaser.Physics.Arcade.Sprite {
     super(scene, x, y, type);
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    this.body.setSize(20, 20);
+    this.body.setSize(type === 'villager' ? 24 : 20, type === 'villager' ? 24 : 20);
 
     this.npcType = type;
     this.candyGroup = candyGroup;

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Generate Placeholder Assets</title>
+  <style>
+    body { font-family: sans-serif; padding: 24px; background: #1a1a2e; color: #eee; margin: 0; }
+    h1 { color: #ff69b4; margin-top: 0; }
+    p { color: #aaa; }
+    code { background: #0f3460; padding: 2px 6px; border-radius: 4px; }
+    .grid { display: flex; flex-wrap: wrap; gap: 16px; margin: 24px 0; }
+    .item { background: #16213e; padding: 12px; border-radius: 8px; text-align: center; }
+    .item canvas { display: block; margin: 0 auto 8px; image-rendering: pixelated; border: 1px solid #333; }
+    .item span { font-size: 11px; color: #888; line-height: 1.6; }
+    button {
+      background: #ff69b4; color: #fff; border: none;
+      padding: 12px 28px; font-size: 15px; border-radius: 6px;
+      cursor: pointer; margin-right: 12px;
+    }
+    button:hover { background: #ff90c8; }
+    .note {
+      background: #0f3460; padding: 14px 16px; border-radius: 6px;
+      margin-top: 20px; font-size: 13px; line-height: 1.8; color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Placeholder Asset Generator</h1>
+  <p>
+    Generates solid-color PNG placeholders for all game sprites and tiles.
+    Click <strong>Download All</strong>, then place the files in the
+    <code>assets/</code> folder next to <code>index.html</code>.
+    Replace with real art any time — texture keys stay the same.
+  </p>
+
+  <div class="grid" id="grid"></div>
+
+  <button onclick="downloadAll()">&#11015; Download All</button>
+
+  <div class="note">
+    <strong>After downloading:</strong> Move all PNG files into <code>assets/</code>.<br>
+    Each file is a solid-color square at the correct pixel dimensions.<br>
+    Swap in real pixel art by replacing individual files — no code changes needed.
+  </div>
+
+  <script>
+    const ASSETS = [
+      { name: 'tile_plains',         w: 32, h: 32, color: '#4a7c3f', label: 'Plains tile' },
+      { name: 'tile_fields',         w: 32, h: 32, color: '#d4a017', label: 'Fields tile' },
+      { name: 'tile_mountain_base',  w: 32, h: 32, color: '#7a5c3a', label: 'Mountain base tile' },
+      { name: 'tile_mountain_peak',  w: 32, h: 32, color: '#5a3e28', label: 'Mountain peak tile' },
+      { name: 'tile_candy_mountain', w: 32, h: 32, color: '#ff69b4', label: 'Candy mountain tile' },
+      { name: 'tile_forest',         w: 32, h: 32, color: '#1a4d10', label: 'Forest tile' },
+      { name: 'tile_rocks',          w: 32, h: 32, color: '#888888', label: 'Rocks tile' },
+      { name: 'player',              w: 32, h: 32, color: '#ffd700', label: 'Player' },
+      { name: 'candy',               w: 24, h: 24, color: '#ff69b4', label: 'Candy collectible' },
+      { name: 'hud_candy',           w: 20, h: 20, color: '#ff69b4', label: 'HUD candy icon' },
+      { name: 'villager',            w: 32, h: 32, color: '#87ceeb', label: 'Villager NPC' },
+      { name: 'thief',               w: 28, h: 28, color: '#8b0000', label: 'Thief NPC' },
+    ];
+
+    const PREVIEW_SCALE = 3;
+    const grid = document.getElementById('grid');
+
+    for (const asset of ASSETS) {
+      const canvas = document.createElement('canvas');
+      canvas.width = asset.w;
+      canvas.height = asset.h;
+      canvas.style.width  = (asset.w * PREVIEW_SCALE) + 'px';
+      canvas.style.height = (asset.h * PREVIEW_SCALE) + 'px';
+
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = asset.color;
+      ctx.fillRect(0, 0, asset.w, asset.h);
+
+      const label = document.createElement('span');
+      label.innerHTML = `${asset.name}.png<br>${asset.w}&times;${asset.h} &mdash; ${asset.label}`;
+
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.appendChild(canvas);
+      div.appendChild(label);
+      grid.appendChild(div);
+
+      asset.canvas = canvas;
+    }
+
+    function downloadAll() {
+      ASSETS.forEach((asset, i) => {
+        setTimeout(() => {
+          const a = document.createElement('a');
+          a.download = asset.name + '.png';
+          a.href = asset.canvas.toDataURL('image/png');
+          a.click();
+        }, i * 120);
+      });
+    }
+  </script>
+</body>
+</html>
