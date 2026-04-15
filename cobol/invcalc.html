@@ -423,43 +423,37 @@ public class INVCALC {
         getInvoice().setInvDate("20230914");
         getInvoice().setInvNumber("Sample 1");
         getInvoice().setInvLineItemCount(3);
-        getInvoice().getInvLine(1 - 1).setInvLineSku("PROD004411");
-        getInvoice().getInvLine(1 - 1).setInvLineUnitPrice(new BigDecimal("18.55"));
-        getInvoice().getInvLine(1 - 1).setInvLineQuantity(2);
-        getInvoice().getInvLine(1 - 1).getInvLineTaxable().setTaxableItem();
-        getInvoice().getInvLine(2 - 1).setInvLineSku("PROD004412");
-        getInvoice().getInvLine(2 - 1).setInvLineUnitPrice(new BigDecimal("6.32"));
-        getInvoice().getInvLine(2 - 1).setInvLineQuantity(4);
-        getInvoice().getInvLine(2 - 1).getInvLineTaxable().setNontaxableItem();
-        getInvoice().getInvLine(3 - 1).setInvLineSku("PROD004413");
-        getInvoice().getInvLine(3 - 1).setInvLineUnitPrice(new BigDecimal("2.28"));
-        getInvoice().getInvLine(3 - 1).setInvLineQuantity(8);
-        getInvoice().getInvLine(1 - 1).getInvLineTaxable().setTaxableItem();
+        getInvoice().getInvLine(0).setInvLineSku("PROD004411");
+        getInvoice().getInvLine(0).setInvLineUnitPrice(new BigDecimal("18.55"));
+        getInvoice().getInvLine(0).setInvLineQuantity(2);
+        getInvoice().getInvLine(0).getInvLineTaxable().setTaxableItem();
+        getInvoice().getInvLine(1).setInvLineSku("PROD004412");
+        getInvoice().getInvLine(1).setInvLineUnitPrice(new BigDecimal("6.32"));
+        getInvoice().getInvLine(1).setInvLineQuantity(4);
+        getInvoice().getInvLine(1).getInvLineTaxable().setNontaxableItem();
+        getInvoice().getInvLine(2).setInvLineSku("PROD004413");
+        getInvoice().getInvLine(2).setInvLineUnitPrice(new BigDecimal("2.28"));
+        getInvoice().getInvLine(2).setInvLineQuantity(8);
+        getInvoice().getInvLine(0).getInvLineTaxable().setTaxableItem();
         getFiller0().setCumulativePriceBeforeTax(BigDecimal.ZERO);
         getFiller0().setCumulativePriceWithTax(BigDecimal.ZERO);
         getFiller0().setCumulativeSalesTax(BigDecimal.ZERO);
         getFiller0().setWorkingIndex(0);
-        for(getFiller0().setWorkingIndex(1) ;!(getFiller0().getWorkingIndex() > getInvoice().getInvLineItemCount()); getFiller0().setWorkingIndex(getFiller0().getWorkingIndex() + 1)) {
-            if(true && true) {
-                getFiller0().setLineWorkingTotal(BigDecimal.ZERO);
-                getFiller0().setLineWorkingTax(BigDecimal.ZERO);
-                getFiller0().setLineWorkingTotal(BigDecimal.valueOf(getInvoice().getInvLine(getFiller0().getWorkingIndex() - 1).getInvLineQuantity()).multiply(getInvoice().getInvLine(getFiller0().getWorkingIndex() - 1).getInvLineUnitPrice()).setScale(2, RoundingMode.DOWN));
-                getFiller0().setCumulativePriceBeforeTax(getFiller0().getCumulativePriceBeforeTax().add(getFiller0().getLineWorkingTotal()));
+        for(getFiller0().setWorkingIndex(1) ;getFiller0().getWorkingIndex() <= getInvoice().getInvLineItemCount(); getFiller0().setWorkingIndex(getFiller0().getWorkingIndex() + 1)) {
+            getFiller0().setLineWorkingTotal(BigDecimal.ZERO);
+            getFiller0().setLineWorkingTax(BigDecimal.ZERO);
+            getFiller0().setLineWorkingTotal(BigDecimal.valueOf(getInvoice().getInvLine(getFiller0().getWorkingIndex() - 1).getInvLineQuantity()).multiply(getInvoice().getInvLine(getFiller0().getWorkingIndex() - 1).getInvLineUnitPrice()).setScale(2, RoundingMode.DOWN));
+            getFiller0().setCumulativePriceBeforeTax(getFiller0().getCumulativePriceBeforeTax().add(getFiller0().getLineWorkingTotal()));
 
-                if(getInvoice().getInvLine(getFiller0().getWorkingIndex() - 1).getInvLineTaxable().getTaxableItem()) {
-                    getFiller0().setLineWorkingTax(getFiller0().getLineWorkingTotal().multiply(getFiller0().getSalesTaxRate()).setScale(3, RoundingMode.DOWN));
-                    getFiller0().setLineWorkingTotal(getFiller0().getLineWorkingTotal().add(getFiller0().getLineWorkingTax()));
-
-                }
-
-                getFiller0().setCumulativePriceWithTax(getFiller0().getCumulativePriceWithTax().add(getFiller0().getLineWorkingTotal()));
-
-                getFiller0().setCumulativeSalesTax(getFiller0().getCumulativeSalesTax().add(getFiller0().getLineWorkingTax()));
+            if(getInvoice().getInvLine(getFiller0().getWorkingIndex() - 1).getInvLineTaxable().getTaxableItem()) {
+                getFiller0().setLineWorkingTax(getFiller0().getLineWorkingTotal().multiply(getFiller0().getSalesTaxRate()).setScale(3, RoundingMode.DOWN));
+                getFiller0().setLineWorkingTotal(getFiller0().getLineWorkingTotal().add(getFiller0().getLineWorkingTax()));
 
             }
-            else {
-                invalidInvoiceData();
-            }
+
+            getFiller0().setCumulativePriceWithTax(getFiller0().getCumulativePriceWithTax().add(getFiller0().getLineWorkingTotal()));
+
+            getFiller0().setCumulativeSalesTax(getFiller0().getCumulativeSalesTax().add(getFiller0().getLineWorkingTax()));
 
         }
         getInvoice().setInvTotalSalesTax(getFiller0().getCumulativeSalesTax());
@@ -495,7 +489,7 @@ public class INVCALC {
             System.out.println("This is a return");
         }
 
-        for(getFiller0().setWorkingIndex(1) ;!(getFiller0().getWorkingIndex() > getInvoice().getInvLineItemCount()); getFiller0().setWorkingIndex(getFiller0().getWorkingIndex() + 1)) {
+        for(getFiller0().setWorkingIndex(1) ;getFiller0().getWorkingIndex() <= getInvoice().getInvLineItemCount(); getFiller0().setWorkingIndex(getFiller0().getWorkingIndex() + 1)) {
             System.out.println();
             getInvoiceFormatted().setLineNumberFormatted(BigDecimal.valueOf(getFiller0().getWorkingIndex()));
             System.out.println("Line " + getInvoiceFormatted().getLineNumberFormatted());
@@ -518,7 +512,8 @@ public class INVCALC {
         INVCALC instance = new INVCALC();
         instance.main();
     }
-}</code></pre>
+}
+</code></pre>
             </div>
         </div>
 
