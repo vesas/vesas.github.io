@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vesa Saarinen, Software developer, Portfolio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Personal web page for Vesa Saarinen, software developer from Finland.">
+  <link href="./../styles.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/monokai-sublime.min.css">
+</head>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+
+<!-- and it's easy to individually load additional languages -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/java.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/cobol.min.js"></script>
+
+<style>
+    /* Override highlight.js default background */
+    .hljs {
+        background: transparent !important;
+        padding: 0 !important;
+    }
+    pre {
+        background: #2a2a2a !important;
+        margin: 0 !important;
+        padding: 1rem !important;
+        border-radius: 0.375rem !important;
+    }
+    .modernized pre {
+        background: #1f2937 !important;
+        border: 1px solid #10b981;
+    }
+    .pill {
+        display: inline-block;
+        padding: 0.125rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+    .pill-before { background: #7f1d1d; color: #fecaca; }
+    .pill-after  { background: #064e3b; color: #a7f3d0; }
+    .pill-source { background: #1e3a8a; color: #bfdbfe; }
+</style>
+
+<script>hljs.highlightAll();</script>
+
+<body class="bg-slate-800 text-gray-100 px-2">
+
+    <div class="container mx-auto">
+
+        <div class="py-4">
+            <a href="../index.html" class="text-sm text-slate-400 hover:text-slate-200">&larr; Back to portfolio</a>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-2 px-2">Cobol to Java modernizer</h2>
+        <h3 class="text-lg font-semibold mb-2 px-2 text-slate-300">A four-stage pipeline: parse &rarr; transpile &rarr; modernize &rarr; optimize</h3>
+
+        <p class="mb-2 p-2 text-slate-300">
+            This project converts legacy Cobol programs into modern Java. A grammar-driven parser and AST transformation pipeline produce runtime-correct Java. The output is correct but verbose: getter/setter pairs, fixed-size arrays, numbered <code class="text-slate-100">Filler</code> groups, <code class="text-slate-100">CharSequence</code> shims for byte-layout.
+        </p>
+
+        <p class="mb-2 p-2 text-slate-300">
+            An LLM stage then refactors this into records, streams and clean naming while preserving runtime behaviour. A second, optional LLM stage runs a profile-guided performance pass on hot methods. An integration test suite runs against each stage's output and flags any sample that diverges from the Cobol reference.
+        </p>
+
+        <p class="mb-4 p-2 text-slate-300">
+            The example below is the <span class="text-slate-100 font-semibold">INVCALC</span> invoice calculation program. Around 220 lines of Cobol become 280 lines of transpiled Java, then 70 lines of modernized Java. All three produce the same output.
+        </p>
+
+        <!-- Stage 1 + 2: Cobol and raw Java side-by-side -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-gray-800 rounded-lg p-2">
+                <div class="flex items-center justify-between mb-2 px-1">
+                    <h2 class="text-xl font-bold">Cobol</h2>
+                    <span class="pill pill-source">Stage 0 &middot; source</span>
+                </div>
+                <pre><code class="language-x">*****************************************************************
+* Program name:    INVCALC
+* Original author: Dave Nicolette
+*
+* Demonstrates typical Cobol business calculations.
+*****************************************************************
+ IDENTIFICATION DIVISION.
+ PROGRAM-ID.  INVCALC.
+ DATA DIVISION.
+ WORKING-STORAGE SECTION.
+ 01  FILLER.
+     05  SALES-TAX-RATE           PIC SV9(5) COMP-3 VALUE 0.065.
+     05  WORKING-INDEX            PIC S9(04) COMP.
+     05  CUMULATIVE-PRICE-BEFORE-TAX PIC S9(07)V99 COMP-3.
+     05  CUMULATIVE-PRICE-WITH-TAX   PIC S9(07)V99 COMP-3.
+     05  CUMULATIVE-SALES-TAX     PIC S9(05)V9(03) COMP-3.
+     05  LINE-WORKING-TOTAL       PIC S9(07)V99 COMP-3.
+     05  LINE-WORKING-TAX         PIC S9(05)V9(03) COMP-3.
+
+ 01  INVOICE.
+     05  INV-DATE                 PIC X(08).
+     05  INV-NUMBER               PIC X(08).
+     05  INV-TOTAL-AMOUNT         PIC S9(07)V99 COMP-3.
+     05  INV-TOTAL-BEFORE-TAX     PIC S9(07)V99 COMP-3.
+     05  INV-TOTAL-SALES-TAX      PIC S9(05)V9(03) COMP-3.
+     05  INV-RETURN               PIC X.
+         88 IS-RETURN             VALUE 'R'.
+     05  INV-LINE-ITEM-COUNT      PIC S9(05) COMP-3.
+     05  INV-LINE OCCURS 1 TO 100
+                  DEPENDING ON INV-LINE-ITEM-COUNT.
+         10  INV-LINE-SKU         PIC X(10).
+         10  INV-LINE-UNIT-PRICE  PIC S9(05)V99 COMP-3.
+         10  INV-LINE-QUANTITY    PIC S9(05) COMP-3.
+         10  INV-LINE-TAXABLE     PIC X.
+             88  TAXABLE-ITEM     VALUE 'T'.
+             88  NONTAXABLE-ITEM  VALUE 'N'.
+
+ PROCEDURE DIVISION.
+
+     INITIALIZE INVOICE
+         REPLACING ALPHANUMERIC DATA BY SPACES
+                   NUMERIC DATA BY ZEROES
+
+     MOVE '20230914' TO INV-DATE
+     MOVE 'Sample 1' TO INV-NUMBER
+     MOVE 3 TO INV-LINE-ITEM-COUNT
+
+     MOVE 'PROD004411' TO INV-LINE-SKU(1)
+     MOVE 18.55 TO INV-LINE-UNIT-PRICE(1)
+     MOVE 2 TO INV-LINE-QUANTITY(1)
+     SET TAXABLE-ITEM(1) TO TRUE
+
+     MOVE 'PROD004412' TO INV-LINE-SKU(2)
+     MOVE 6.32 TO INV-LINE-UNIT-PRICE(2)
+     MOVE 4 TO INV-LINE-QUANTITY(2)
+     SET NONTAXABLE-ITEM(2) TO TRUE
+
+     MOVE 'PROD004413' TO INV-LINE-SKU(3)
+     MOVE 2.28 TO INV-LINE-UNIT-PRICE(3)
+     MOVE 8 TO INV-LINE-QUANTITY(3)
+     SET TAXABLE-ITEM(1) TO TRUE
+
+     MOVE ZERO TO CUMULATIVE-PRICE-BEFORE-TAX
+                  CUMULATIVE-PRICE-WITH-TAX
+                  CUMULATIVE-SALES-TAX
+                  WORKING-INDEX
+
+     PERFORM WITH TEST BEFORE
+             VARYING WORKING-INDEX
+             FROM 1 BY 1
+             UNTIL WORKING-INDEX > INV-LINE-ITEM-COUNT
+         IF INV-LINE-QUANTITY(WORKING-INDEX) IS NUMERIC
+         AND INV-LINE-UNIT-PRICE(WORKING-INDEX) IS NUMERIC
+             MOVE ZERO TO LINE-WORKING-TOTAL LINE-WORKING-TAX
+             MULTIPLY
+                 INV-LINE-QUANTITY(WORKING-INDEX)
+                 BY INV-LINE-UNIT-PRICE(WORKING-INDEX)
+                 GIVING LINE-WORKING-TOTAL
+             END-MULTIPLY
+             ADD LINE-WORKING-TOTAL TO CUMULATIVE-PRICE-BEFORE-TAX
+             IF TAXABLE-ITEM(WORKING-INDEX)
+                 MULTIPLY LINE-WORKING-TOTAL
+                     BY SALES-TAX-RATE
+                     GIVING LINE-WORKING-TAX
+                 ADD LINE-WORKING-TAX TO LINE-WORKING-TOTAL
+             END-IF
+             ADD LINE-WORKING-TOTAL TO CUMULATIVE-PRICE-WITH-TAX
+             ADD LINE-WORKING-TAX   TO CUMULATIVE-SALES-TAX
+         ELSE
+             PERFORM INVALID-INVOICE-DATA
+         END-IF
+     END-PERFORM
+
+     MOVE CUMULATIVE-SALES-TAX         TO INV-TOTAL-SALES-TAX
+     MOVE CUMULATIVE-PRICE-BEFORE-TAX  TO INV-TOTAL-BEFORE-TAX
+     MOVE CUMULATIVE-PRICE-WITH-TAX    TO INV-TOTAL-AMOUNT
+
+     PERFORM PRINT-INVOICE-DETAILS
+     GOBACK
+     .</code></pre>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg p-2">
+                <div class="flex items-center justify-between mb-2 px-1">
+                    <h2 class="text-xl font-bold">Raw transpiled Java</h2>
+                    <span class="pill pill-before">Stage 1 &middot; before</span>
+                </div>
+                <pre><code class="language-java">package fi.vesas.translator;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import fi.vesas.translator.util.PicFormatter;
+import org.apache.commons.lang3.StringUtils;
+
+public class INVCALC {
+
+    public class Filler0Type implements CharSequence {
+        private BigDecimal salesTaxRate = new BigDecimal("0.065");
+        public BigDecimal getSalesTaxRate() { return salesTaxRate; }
+        public void setSalesTaxRate(BigDecimal value) { salesTaxRate = value; }
+        private int workingIndex;
+        public int getWorkingIndex() { return workingIndex; }
+        public void setWorkingIndex(int value) { workingIndex = (int)(value % 10000L); }
+        private BigDecimal cumulativePriceBeforeTax = BigDecimal.ZERO;
+        public BigDecimal getCumulativePriceBeforeTax() { return cumulativePriceBeforeTax; }
+        public void setCumulativePriceBeforeTax(BigDecimal value) { cumulativePriceBeforeTax = value; }
+        private BigDecimal cumulativePriceWithTax = BigDecimal.ZERO;
+        public BigDecimal getCumulativePriceWithTax() { return cumulativePriceWithTax; }
+        public void setCumulativePriceWithTax(BigDecimal value) { cumulativePriceWithTax = value; }
+        private BigDecimal cumulativeSalesTax = BigDecimal.ZERO;
+        public BigDecimal getCumulativeSalesTax() { return cumulativeSalesTax; }
+        public void setCumulativeSalesTax(BigDecimal value) { cumulativeSalesTax = value; }
+        private BigDecimal lineWorkingTotal = BigDecimal.ZERO;
+        public BigDecimal getLineWorkingTotal() { return lineWorkingTotal; }
+        public void setLineWorkingTotal(BigDecimal value) { lineWorkingTotal = value; }
+        private BigDecimal lineWorkingTax = BigDecimal.ZERO;
+        public BigDecimal getLineWorkingTax() { return lineWorkingTax; }
+        public void setLineWorkingTax(BigDecimal value) { lineWorkingTax = value; }
+
+        public String toString() { return salesTaxRate.toPlainString() + String.format("%04d", workingIndex) + /* ... */ ""; }
+        public int length() { return toString().length(); }
+        public char charAt(int i) { return toString().charAt(i); }
+        public CharSequence subSequence(int s, int e) { return toString().subSequence(s, e); }
+    }
+    private Filler0Type filler0 = new Filler0Type();
+    public Filler0Type getFiller0() { return filler0; }
+
+    public class InvoiceType implements CharSequence {
+        private String invDate = "        ";
+        public String getInvDate() { return invDate; }
+        public void setInvDate(String value) { invDate = StringUtils.rightPad(value == null ? "" : value, 8).substring(0, 8); }
+        private String invNumber = "        ";
+        public String getInvNumber() { return invNumber; }
+        public void setInvNumber(String value) { invNumber = StringUtils.rightPad(value == null ? "" : value, 8).substring(0, 8); }
+        private BigDecimal invTotalAmount = BigDecimal.ZERO;
+        public BigDecimal getInvTotalAmount() { return invTotalAmount; }
+        public void setInvTotalAmount(BigDecimal value) { invTotalAmount = value; }
+        // ... invTotalBeforeTax, invTotalSalesTax, invReturn, invLineItemCount
+        // ... nested InvLineType with taxable/nontaxable 88-level booleans
+        // ... InvLineType[] invLine = new InvLineType[100];
+        // ... lazy init: if (invLine[idx] == null) invLine[idx] = new InvLineType();
+        // ... CharSequence impl, toString concatenates all fields as Cobol byte layout
+    }
+    private InvoiceType invoice = new InvoiceType();
+    public InvoiceType getInvoice() { return invoice; }
+
+    // ... InvoiceFormattedType with PIC-clause emulated formatters
+    // ... private InvoiceFormattedType invoiceFormatted = new InvoiceFormattedType();
+
+    public void main() {
+        getInvoice().setInvDate(" ");
+        getInvoice().setInvNumber(" ");
+        getInvoice().setInvTotalAmount(BigDecimal.ZERO);
+        // ... 10 more zero-initializations
+        getInvoice().setInvDate("20230914");
+        getInvoice().setInvNumber("Sample 1");
+        getInvoice().setInvLineItemCount(3);
+        getInvoice().getInvLine(0).setInvLineSku("PROD004411");
+        getInvoice().getInvLine(0).setInvLineUnitPrice(new BigDecimal("18.55"));
+        getInvoice().getInvLine(0).setInvLineQuantity(2);
+        getInvoice().getInvLine(0).getInvLineTaxable().setTaxableItem();
+        // ... line 1 and 2 initialization (same pattern)
+
+        for (getFiller0().setWorkingIndex(1);
+             getFiller0().getWorkingIndex() &lt;= getInvoice().getInvLineItemCount();
+             getFiller0().setWorkingIndex(getFiller0().getWorkingIndex() + 1)) {
+
+            getFiller0().setLineWorkingTotal(BigDecimal.ZERO);
+            getFiller0().setLineWorkingTax(BigDecimal.ZERO);
+            getFiller0().setLineWorkingTotal(
+                BigDecimal.valueOf(getInvoice().getInvLine(getFiller0().getWorkingIndex() - 1).getInvLineQuantity())
+                    .multiply(getInvoice().getInvLine(getFiller0().getWorkingIndex() - 1).getInvLineUnitPrice())
+                    .setScale(2, RoundingMode.DOWN));
+            getFiller0().setCumulativePriceBeforeTax(
+                getFiller0().getCumulativePriceBeforeTax().add(getFiller0().getLineWorkingTotal()));
+
+            if (getInvoice().getInvLine(getFiller0().getWorkingIndex() - 1).getInvLineTaxable().getTaxableItem()) {
+                getFiller0().setLineWorkingTax(
+                    getFiller0().getLineWorkingTotal().multiply(getFiller0().getSalesTaxRate()).setScale(3, RoundingMode.DOWN));
+                getFiller0().setLineWorkingTotal(
+                    getFiller0().getLineWorkingTotal().add(getFiller0().getLineWorkingTax()));
+            }
+            getFiller0().setCumulativePriceWithTax(
+                getFiller0().getCumulativePriceWithTax().add(getFiller0().getLineWorkingTotal()));
+            getFiller0().setCumulativeSalesTax(
+                getFiller0().getCumulativeSalesTax().add(getFiller0().getLineWorkingTax()));
+        }
+        getInvoice().setInvTotalSalesTax(getFiller0().getCumulativeSalesTax());
+        getInvoice().setInvTotalBeforeTax(getFiller0().getCumulativePriceBeforeTax());
+        getInvoice().setInvTotalAmount(getFiller0().getCumulativePriceWithTax());
+        printInvoiceDetails();
+    }
+
+    // ... printInvoiceDetails() with 30+ lines of StringUtils.overlay / PicFormatter calls
+
+    public static void main(String[] args) throws Exception {
+        INVCALC instance = new INVCALC();
+        instance.main();
+    }
+}</code></pre>
+                <p class="mt-2 px-1 text-xs text-slate-500 italic">Abridged for display. Full output is around 280 lines.</p>
+            </div>
+        </div>
+
+        <!-- Stage 2: Modernized Java, full width -->
+        <div class="mt-8 modernized bg-gray-800 rounded-lg p-2">
+            <div class="flex items-center justify-between mb-2 px-1">
+                <h2 class="text-xl font-bold text-emerald-300">LLM-modernized Java</h2>
+                <span class="pill pill-after">Stage 2 &middot; after &middot; Claude Sonnet 4.6</span>
+            </div>
+<pre><code class="language-java">package fi.vesas.translator;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
+
+public class Invcalc {
+
+    private static final BigDecimal SALES_TAX_RATE = new BigDecimal("0.065");
+
+    public record InvoiceLine(String sku, BigDecimal unitPrice, int quantity, boolean taxable) {
+        public BigDecimal baseTotal() {
+            return unitPrice.multiply(BigDecimal.valueOf(quantity)).setScale(2, RoundingMode.DOWN);
+        }
+        public BigDecimal tax() {
+            return taxable
+                ? baseTotal().multiply(SALES_TAX_RATE).setScale(3, RoundingMode.DOWN)
+                : BigDecimal.ZERO;
+        }
+        public BigDecimal totalWithTax() {
+            return baseTotal().add(tax());
+        }
+    }
+
+    public record Invoice(String date, String number, List&lt;InvoiceLine&gt; lines) {
+        public BigDecimal totalBeforeTax() {
+            return lines.stream().map(InvoiceLine::baseTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+        public BigDecimal totalSalesTax() {
+            return lines.stream().map(InvoiceLine::tax).reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+        public BigDecimal totalAmount() {
+            return lines.stream().map(InvoiceLine::totalWithTax).reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+    }
+
+    public static void main(String[] args) {
+        Invoice invoice = new Invoice(
+            "20230914",
+            "Sample 1",
+            List.of(
+                new InvoiceLine("PROD004411", new BigDecimal("18.55"), 2, true),
+                new InvoiceLine("PROD004412", new BigDecimal("6.32"),  4, false),
+                new InvoiceLine("PROD004413", new BigDecimal("2.28"),  8, false) // see reviewer note #3
+            )
+        );
+        printInvoice(invoice);
+    }
+
+    private static void printInvoice(Invoice invoice) {
+        System.out.println();
+        System.out.println("----------------------------------------");
+        System.out.printf("Invoice Number:   %s%n", invoice.number());
+        System.out.printf("Invoice Date:     %s/%s/%s%n",
+                invoice.date().substring(0, 4),
+                invoice.date().substring(4, 6),
+                invoice.date().substring(6, 8));
+        System.out.printf("Total Amount:          $%6.2f%n",  invoice.totalAmount());
+        System.out.printf("Total Before Tax:      $%6.2f%n",  invoice.totalBeforeTax());
+        System.out.printf("Total Sales Tax:        $%.3f%n",  invoice.totalSalesTax());
+        System.out.printf("Sales Tax Rate:     %.5f%n",       SALES_TAX_RATE);
+
+        int lineNumber = 1;
+        for (InvoiceLine line : invoice.lines()) {
+            System.out.println();
+            System.out.printf("Line  %2d%n",          lineNumber++);
+            System.out.printf("SKU  %s%n",            line.sku());
+            System.out.printf("Quantity    %d%n",     line.quantity());
+            System.out.printf("Unit Price:    $%6.2f%n", line.unitPrice());
+            System.out.println(line.taxable() ? "Taxable Item" : "Nontaxable Item");
+        }
+    }
+}</code></pre>
+            <p class="mt-2 px-1 text-xs text-emerald-200/70 italic">Around 70 lines. Runtime output matches the raw transpiled version, verified by the integration test suite.</p>
+        </div>
+
+        <!-- Reviewer notes -->
+        <div class="mt-8 bg-gray-800 rounded-lg p-4">
+            <h3 class="text-lg font-bold mb-3 text-slate-100">Reviewer notes <span class="text-sm font-normal text-slate-400">returned by the model as structured output</span></h3>
+            <ol class="list-decimal list-inside space-y-2 text-slate-300">
+                <li>
+                    <span class="text-slate-100">Filler group eliminated.</span>
+                    <code class="text-slate-100">Filler0Type</code> held loop-local accumulators (<code class="text-slate-100">cumulative*</code>, <code class="text-slate-100">lineWorking*</code>) that in Cobol shared memory with the data division, but in Java have no reason to be class fields. They collapse into stream reductions on <code class="text-slate-100">InvoiceLine</code>.
+                </li>
+                <li>
+                    <span class="text-slate-100">Fixed-size array &rarr; <code class="text-slate-100">List&lt;InvoiceLine&gt;</code>.</span>
+                    Cobol's <code class="text-slate-100">OCCURS 1 TO 100 DEPENDING ON</code> maps to a bounded array with lazy init in the raw Java. The bound isn't load-bearing &mdash; it's a legacy memory constraint &mdash; so modernization uses an unbounded <code class="text-slate-100">List</code>. Flag if callers relied on index-based mutation semantics.
+                </li>
+                <li>
+                    <span class="text-rose-300">Suspected bug in source preserved.</span>
+                    Cobol line 124 reads <code class="text-slate-100">SET TAXABLE-ITEM(1) TO TRUE</code> but appears in the line-3 initialization block &mdash; likely a copy-paste typo for <code class="text-slate-100">(3)</code>. Runtime leaves line 3 non-taxable. Modernized code preserves this (line 3 <code class="text-slate-100">taxable = false</code>) to maintain equivalence. Recommend a separate human-reviewed bug-fix pass.
+                </li>
+                <li>
+                    <span class="text-slate-100"><code class="text-slate-100">IS NUMERIC</code> check dropped.</span>
+                    The Cobol <code class="text-slate-100">IF ... IS NUMERIC</code> guard is redundant once types are Java <code class="text-slate-100">int</code> / <code class="text-slate-100">BigDecimal</code>. Both the raw transpiler and the modernized code elide it; no behavioural change on valid input. Flagged for auditors.
+                </li>
+                <li>
+                    <span class="text-slate-100">PIC-clause formatters replaced with <code class="text-slate-100">printf</code>.</span>
+                    The <code class="text-slate-100">InvoiceFormattedType</code> class and <code class="text-slate-100">PicFormatter</code> utility emulate Cobol PIC clauses character-by-character. For display-only output, Java format strings match byte-for-byte and remove an entire helper class.
+                </li>
+                <li>
+                    <span class="text-slate-100">88-level condition names inlined.</span>
+                    <code class="text-slate-100">TAXABLE-ITEM / NONTAXABLE-ITEM</code> (Cobol 88-levels on a single character field) become a <code class="text-slate-100">boolean taxable</code>. The <code class="text-slate-100">InvLineTaxableType</code> wrapper class disappears.
+                </li>
+                <li>
+                    <span class="text-slate-100"><code class="text-slate-100">CharSequence</code> shims dropped.</span>
+                    The raw Java implements <code class="text-slate-100">CharSequence</code> on every structure to preserve Cobol's byte-layout <code class="text-slate-100">MOVE</code> semantics. Not exercised in this program's call graph; removed. If other programs <code class="text-slate-100">MOVE</code> a whole structure to a <code class="text-slate-100">PIC X</code> field, keep the shim there.
+                </li>
+            </ol>
+        </div>
+
+        <!-- How it works -->
+        <div class="mt-8 bg-gray-800 rounded-lg p-4">
+            <h3 class="text-lg font-bold mb-3 text-slate-100">How it works</h3>
+
+            <h4 class="text-slate-100 font-semibold mt-3">Pipeline stages</h4>
+            <p class="text-slate-300 mt-1">
+                Stage 0 is the Cobol source. Stage 1 is the ANTLR4-driven transpiler, producing verbose but runtime-correct Java.
+                Stage 2 sends this Java and a compact summary of the Cobol AST to Claude Sonnet 4.6 with a style guide covering records, streams, naming, and Java idioms.
+                The model returns a JSON envelope with the modernized source and reviewer notes. Stage 3 is described below.
+            </p>
+
+            <h4 class="text-slate-100 font-semibold mt-4">Performance pass (Stage 3)</h4>
+            <p class="text-slate-300 mt-1">
+                Readability and performance are different goals, so they get different prompts. Stage 2 aims for readability. Stage 3 is a separate pass, driven by profiling.
+                It takes a JMH benchmark or a representative workload, identifies the hot methods, and rewrites only those.
+                Typical rewrites include <code class="text-slate-100">BigDecimal</code> to scaled <code class="text-slate-100">long</code>, streams to indexed loops, and pooled buffers for per-call allocations.
+                Cold code keeps its stage 2 form. A benchmark check confirms stage 3 is actually faster than stage 2.
+                The integration tests run against stage 3 output too, so a speed win that breaks semantics is rejected.
+                INVCALC above is not a performance case. It runs once and finishes in microseconds, so stage 3 was not applied here.
+            </p>
+
+            <h4 class="text-slate-100 font-semibold mt-4">Prompt caching</h4>
+            <p class="text-slate-300 mt-1">
+                The style guide and few-shot examples are long and stable, around 8k tokens. Each file-level input is small.
+                The system prompt has a cache breakpoint, so later files in a batch hit the cache (<code class="text-slate-100">usage.cache_read_input_tokens</code> &gt; 0).
+                This cuts per-file latency and cost significantly on a multi-file codebase.
+            </p>
+
+            <h4 class="text-slate-100 font-semibold mt-4">Correctness guarantee</h4>
+            <p class="text-slate-300 mt-1">
+                The transpiler ships with an integration test suite that runs the translated Java and compares output against the Cobol reference.
+                Every stage after transpilation reuses this harness: compile the stage output, run the same inputs, diff against the reference. Stage 3 adds a benchmark check on top.
+                A stage whose output diverges is flagged, not shown as clean.
+            </p>
+        </div>
+
+        <div class="py-8 px-2 text-sm text-slate-400">
+            <a href="../index.html" class="hover:text-slate-200">&larr; Back to portfolio</a>
+        </div>
+
+    </div>
+
+</body>
+</html>

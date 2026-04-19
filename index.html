@@ -44,10 +44,10 @@
         <img class="w-56 h-full sm:h-full sm:w-56" src="img/cobol_ss.png"/>
 
         <div class="px-0 sm:px-5 text-slate-400">
-            <h2 class="text-slate-50 text-xl pb-3 pt-3 sm:pt-0">COBOL to Java transpiler</h2>
+            <h2 class="text-slate-50 text-xl pb-3 pt-3 sm:pt-0">Cobol to Java modernizer</h2>
 
             <p class="pb-2">
-            Automatic source-to-source translator that converts legacy COBOL programs into readable, idiomatic Java. Built around a grammar-driven parser and a multi-stage AST transformation pipeline, with an integration test suite that verifies translated output matches reference behaviour.
+            Converts legacy Cobol programs into modern Java. A grammar-driven parser and multi-stage AST pipeline produce runtime-correct Java. LLM stages then modernize the output into records, streams and clean naming, with an optional profile-guided performance pass on hot methods. An integration test suite checks each stage against the Cobol reference.
             </p>
 
             <div class="py-1">
@@ -55,7 +55,34 @@
             </div>
 
             <div class="py-1">
-                <span class="text-slate-50">Tech:</span> Java, ANTLR4, Maven
+                <span class="text-slate-50">Example:</span> <a href="./cobol/modernizer.html" class="underline hover:text-slate-100">Cobol &rarr; Java &rarr; LLM-modernized Java</a>
+            </div>
+
+            <div class="py-1">
+                <span class="text-slate-50">Tech:</span> Java, ANTLR4, Maven, Anthropic API
+            </div>
+        </div>
+
+    </div>
+    <hr class="border-slate-700"/>
+
+    <div class="flex flex-col sm:flex-row">
+
+        <img class="w-56 h-full sm:h-full sm:w-56" src="img/archaudit_ss.png"/>
+
+        <div class="px-0 sm:px-5 text-slate-400">
+            <h2 class="text-slate-50 text-xl pb-3 pt-3 sm:pt-0">arch-audit</h2>
+
+            <p class="pb-2">
+            A tool for quickly finding the relevant spots in an unknown codebase. It combines Semgrep static analysis, OSV dependency scanning, Tokei code metrics, and tree-sitter structure extraction into an interactive terminal-based findings browser. An optional LLM stage adds risk explanations and remediation guidance per finding.
+            </p>
+
+            <div class="py-1">
+            <span class="text-slate-50">Why:</span> Explore DevSecOps tooling and LLM-assisted code review.
+            </div>
+
+            <div class="py-1">
+                <span class="text-slate-50">Tech:</span> Python, Textual, Semgrep, OSV, Tokei, tree-sitter, Azure OpenAI
             </div>
         </div>
 
