@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+}
+
 @layer components {
   .tech {
     @apply inline-block px-2 py-0.5 text-xs rounded bg-slate-700 text-slate-200;
