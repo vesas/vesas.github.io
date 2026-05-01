@@ -65,6 +65,19 @@
     letter-spacing: -0.01em;
     color: var(--ink);
   }
+  h1[contenteditable] {
+    cursor: text;
+    border-radius: 4px;
+    padding: 2px 6px;
+    margin: -2px -6px;
+    outline: none;
+    transition: background 0.15s;
+  }
+  h1[contenteditable]:hover { background: rgba(0,0,0,0.04); }
+  h1[contenteditable]:focus {
+    background: rgba(30,58,95,0.07);
+    box-shadow: 0 0 0 2px rgba(30,58,95,0.18);
+  }
   .title-block .subtitle {
     color: var(--muted);
     font-size: 13px;
@@ -232,7 +245,21 @@
   .row-name { fill: var(--ink); font-size: 13px; font-weight: 600; }
   .row-meta { fill: var(--muted); font-size: 11px; font-weight: 500; }
 
-  .bar { rx: 5; ry: 5; }
+  .bar {
+    rx: 5; ry: 5;
+    cursor: pointer;
+    transform-box: fill-box;
+    transform-origin: left center;
+    animation: barSlideIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    transition: filter 0.18s ease;
+  }
+  .bar:hover {
+    filter: brightness(1.1) drop-shadow(0 3px 9px rgba(0,0,0,0.2));
+  }
+  @keyframes barSlideIn {
+    from { opacity: 0; transform: scaleX(0); }
+    to   { opacity: 1; transform: scaleX(1); }
+  }
   .bar-shadow { fill: rgba(0,0,0,0.08); }
   .bar-label { fill: white; font-size: 11px; font-weight: 600; pointer-events: none; }
   .bar-duration { fill: var(--muted); font-size: 11px; font-weight: 500; }
@@ -294,7 +321,7 @@
 <div class="page">
   <header class="app-header">
     <div class="title-block">
-      <h1 id="projectTitle">Integraatioiden aikataulu</h1>
+      <h1 id="projectTitle" contenteditable="true" spellcheck="false">Projektin aikataulu</h1>
       <div class="subtitle" id="projectSubtitle">Projektin aikataulukatsaus</div>
     </div>
     <div class="actions">
@@ -339,6 +366,9 @@
     </p>
     <input type="file" id="fileInput" accept=".csv,text/csv" style="display:none">
     <div class="columns">Päivämäärät: ISO-muoto (YYYY-MM-DD) tai suomalainen muoto (DD.MM.YYYY)</div>
+    <div class="columns" style="margin-top:10px">
+      <a href="integraatioiden_aikataulu.csv" download onclick="event.stopPropagation()">Lataa esimerkkitiedosto</a>
+    </div>
   </div>
 
   <div class="footer-note" id="footerNote"></div>
@@ -470,6 +500,39 @@ function quarterOf(d) { return Math.floor(d.getMonth() / 3) + 1; }
 const MONTH_ABBR_FI = ['Tam','Hel','Maa','Huh','Tou','Kes','Hei','Elo','Syy','Lok','Mar','Jou'];
 const MONTH_FULL_FI = ['Tammikuu','Helmikuu','Maaliskuu','Huhtikuu','Toukokuu','Kesäkuu',
                        'Heinäkuu','Elokuu','Syyskuu','Lokakuu','Marraskuu','Joulukuu'];
+const DAY_ABBR_FI   = ['Su','Ma','Ti','Ke','To','Pe','La']; // index = getDay()
+const TICK_W        = { day: 34, week: 72, month: 96 };
+
+function startOfWeek(d) {
+  const delta = (d.getDay() === 0) ? 6 : d.getDay() - 1;
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate() - delta);
+}
+function isoWeekNumber(d) {
+  const thu = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 3 - ((d.getDay() + 6) % 7));
+  const yearStart = new Date(thu.getFullYear(), 0, 1);
+  return 1 + Math.round((thu - yearStart) / 604800000);
+}
+function selectScale(rawDays) {
+  if (rawDays <= 42)  return 'day';
+  if (rawDays <= 180) return 'week';
+  return 'month';
+}
+function buildRangeBounds(minStart, maxEnd, scale) {
+  if (scale === 'month') {
+    return { rangeStart: startOfMonth(minStart), rangeEnd: nextMonth(maxEnd) };
+  }
+  return { rangeStart: startOfWeek(minStart), rangeEnd: addDays(startOfWeek(maxEnd), 7) };
+}
+function buildTicks(rangeStart, rangeEnd, scale) {
+  const ticks = [];
+  let cur = new Date(rangeStart);
+  const step = scale === 'day' ? 1 : scale === 'week' ? 7 : 0;
+  while (cur < rangeEnd) {
+    ticks.push(new Date(cur));
+    cur = step ? addDays(cur, step) : nextMonth(cur);
+  }
+  return ticks;
+}
 
 // ============================================================
 // Rendering
@@ -487,28 +550,24 @@ function renderGantt(tasks) {
   const svg = document.getElementById('chart');
   svg.innerHTML = '';
 
-  // Compute timeline range, padded to month boundaries
+  // Compute timeline range, scale-aware
   const minStart = tasks.reduce((a, t) => t.start < a ? t.start : a, tasks[0].start);
-  const maxEnd = tasks.reduce((a, t) => t.end > a ? t.end : a, tasks[0].end);
-  const rangeStart = startOfMonth(minStart);
-  const rangeEnd = nextMonth(maxEnd);
+  const maxEnd   = tasks.reduce((a, t) => t.end   > a ? t.end   : a, tasks[0].end);
+  const rawDays  = diffDays(minStart, maxEnd) + 1;
+  const scale    = selectScale(rawDays);
+  const { rangeStart, rangeEnd } = buildRangeBounds(minStart, maxEnd, scale);
   const totalDays = diffDays(rangeStart, rangeEnd);
 
   // Layout constants
-  const leftCol = 280;
+  const leftCol   = 280;
   const headerRows = 56;
-  const rowH = 52;
-  const monthW = 96;
-  const padRight = 24;
+  const rowH      = 52;
+  const padRight  = 24;
 
-  // Build month list
-  const months = [];
-  let cur = new Date(rangeStart);
-  while (cur < rangeEnd) {
-    months.push(new Date(cur));
-    cur = nextMonth(cur);
-  }
-  const chartW = months.length * monthW;
+  // Build tick list (one entry per column)
+  const tickW  = TICK_W[scale];
+  const ticks  = buildTicks(rangeStart, rangeEnd, scale);
+  const chartW = ticks.length * tickW;
   const totalW = leftCol + chartW + padRight;
   const totalH = headerRows + tasks.length * rowH + 24;
 
@@ -529,50 +588,63 @@ function renderGantt(tasks) {
   // Background for header band
   svg.appendChild(el('rect', { x: leftCol, y: 0, width: chartW, height: headerRows, class: 'header-row-bg' }));
 
-  // Quarter and month headers
-  const quarterRowH = 24;
-  const monthRowH = headerRows - quarterRowH;
+  // Two-row header: major groups (top) + minor ticks (bottom)
+  const majorRowH = 24;
+  const minorRowH = headerRows - majorRowH; // 32
 
-  // Group months by quarter
-  let qStart = 0;
-  for (let i = 0; i <= months.length; i++) {
-    const m = months[i];
-    const prev = months[i-1];
-    const sameQ = prev && m && m.getFullYear() === prev.getFullYear() && quarterOf(m) === quarterOf(prev);
-    if (i > 0 && (!sameQ || i === months.length)) {
-      const x0 = leftCol + qStart * monthW;
-      const w = (i - qStart) * monthW;
-      const qLabel = `Q${quarterOf(prev)} ${prev.getFullYear()}`;
+  function getMajorKey(tick) {
+    if (scale === 'day')  return `${tick.getFullYear()}-W${isoWeekNumber(tick)}`;
+    if (scale === 'week') return `${tick.getFullYear()}-${tick.getMonth()}`;
+    return `Q${quarterOf(tick)}-${tick.getFullYear()}`;
+  }
+  function getMajorLabel(tick) {
+    if (scale === 'day')  return `V${isoWeekNumber(tick)} ${tick.getFullYear()}`;
+    if (scale === 'week') return `${MONTH_FULL_FI[tick.getMonth()]} ${tick.getFullYear()}`;
+    return `Q${quarterOf(tick)} ${tick.getFullYear()}`;
+  }
+  function getMinorLabel(tick) {
+    if (scale === 'day')  return String(tick.getDate());
+    if (scale === 'week') return `V${isoWeekNumber(tick)}`;
+    return MONTH_ABBR_FI[tick.getMonth()];
+  }
+
+  // Top row: major group labels + dividers
+  let groupStart = 0;
+  for (let i = 0; i <= ticks.length; i++) {
+    const prev = ticks[i - 1], curr = ticks[i];
+    const sameGroup = prev && curr && getMajorKey(curr) === getMajorKey(prev);
+    if (i > 0 && (!sameGroup || i === ticks.length)) {
+      const x0 = leftCol + groupStart * tickW;
+      const w  = (i - groupStart) * tickW;
       svg.appendChild(el('text', {
         x: x0 + w / 2, y: 16, class: 'axis-text quarter-label',
         'text-anchor': 'middle'
-      }, qLabel));
-      // quarter divider
-      if (i < months.length) {
+      }, getMajorLabel(prev)));
+      if (i < ticks.length) {
         svg.appendChild(el('line', {
-          x1: leftCol + i * monthW, y1: 0,
-          x2: leftCol + i * monthW, y2: totalH,
+          x1: leftCol + i * tickW, y1: 0,
+          x2: leftCol + i * tickW, y2: totalH,
           class: 'grid-line quarter'
         }));
       }
-      qStart = i;
+      groupStart = i;
     }
   }
 
-  // Month labels + month grid lines
-  months.forEach((m, i) => {
-    const x = leftCol + i * monthW;
+  // Bottom row: minor tick labels + grid lines
+  ticks.forEach((tick, i) => {
+    const x = leftCol + i * tickW;
     if (i > 0) {
       svg.appendChild(el('line', {
-        x1: x, y1: quarterRowH, x2: x, y2: totalH,
+        x1: x, y1: majorRowH, x2: x, y2: totalH,
         class: 'grid-line month'
       }));
     }
     svg.appendChild(el('text', {
-      x: x + monthW / 2, y: quarterRowH + monthRowH / 2 + 4,
+      x: x + tickW / 2, y: majorRowH + minorRowH / 2 + 4,
       class: 'axis-text month-label',
       'text-anchor': 'middle'
-    }, MONTH_ABBR_FI[m.getMonth()]));
+    }, getMinorLabel(tick)));
   });
 
   // Header bottom border
@@ -586,9 +658,25 @@ function renderGantt(tasks) {
     class: 'left-col-divider'
   }));
 
-  const dayToX = (d) => leftCol + (diffDays(rangeStart, d) / totalDays) * chartW;
+  const dayToX = (d) => {
+    if (scale === 'month') {
+      // Month columns are equal-width but months have unequal day counts,
+      // so interpolate within each month rather than linearly across the whole range.
+      const idx = ticks.findIndex((t, i) =>
+        t <= d && (i === ticks.length - 1 || d < ticks[i + 1])
+      );
+      if (idx === -1) return leftCol;
+      const mStart = ticks[idx];
+      const mEnd = idx + 1 < ticks.length ? ticks[idx + 1] : rangeEnd;
+      return leftCol + (idx + diffDays(mStart, d) / diffDays(mStart, mEnd)) * tickW;
+    }
+    return leftCol + (diffDays(rangeStart, d) / totalDays) * chartW;
+  };
 
-  // Rows: alt background + content
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Pass 1: row backgrounds (must come before weekend shading)
   tasks.forEach((t, i) => {
     const y = headerRows + i * rowH;
     if (i % 2 === 1) {
@@ -596,10 +684,41 @@ function renderGantt(tasks) {
         x: 0, y, width: totalW, height: rowH, class: 'row-bg-alt'
       }));
     }
-    // row separator
     svg.appendChild(el('line', {
       x1: 0, y1: y + rowH, x2: totalW, y2: y + rowH, class: 'grid-line row'
     }));
+  });
+
+  // Weekend column shading (day scale only)
+  if (scale === 'day') {
+    ticks.forEach((tick, i) => {
+      if (tick.getDay() === 0 || tick.getDay() === 6) {
+        svg.appendChild(el('rect', {
+          x: leftCol + i * tickW, y: headerRows,
+          width: tickW, height: totalH - headerRows,
+          fill: 'rgba(0,0,0,0.035)'
+        }));
+      }
+    });
+  }
+
+  // Today band (current period, all scales)
+  if (today >= rangeStart && today < rangeEnd) {
+    const todayIdx = ticks.findIndex((t, i) =>
+      t <= today && (i === ticks.length - 1 || today < ticks[i + 1])
+    );
+    if (todayIdx !== -1) {
+      svg.appendChild(el('rect', {
+        x: leftCol + todayIdx * tickW, y: 0,
+        width: tickW, height: totalH,
+        fill: 'rgba(192,57,43,0.06)'
+      }));
+    }
+  }
+
+  // Pass 2: row content
+  tasks.forEach((t, i) => {
+    const y = headerRows + i * rowH;
 
     // Left column: task name + ticket / size badge
     const nameY = y + rowH / 2 - 4;
@@ -634,6 +753,7 @@ function renderGantt(tasks) {
       rx: 5, ry: 5, fill, class: 'bar', role: 'button'
     });
     svg.appendChild(bar);
+    bar.style.animationDelay = `${i * 0.04}s`;
 
     // size badge on right end of bar
     if (t.size && barW > 50) {
@@ -671,22 +791,17 @@ function renderGantt(tasks) {
   });
 
   // Today line
-  const today = new Date();
-  today.setHours(0,0,0,0);
   if (today >= rangeStart && today <= rangeEnd) {
     const tx = dayToX(today);
     svg.appendChild(el('line', {
-      x1: tx, y1: headerRows - 6, x2: tx, y2: totalH - 6,
+      x1: tx, y1: 0, x2: tx, y2: totalH,
       class: 'today-line'
     }));
-    svg.appendChild(el('text', {
-      x: tx + 6, y: headerRows - 10, class: 'today-label'
-    }, 'TÄNÄÄN'));
   }
 
   // Update subtitle and footer
   document.getElementById('projectSubtitle').textContent =
-    `${tasks.length} työtä  ·  ${fmtDateFi(rangeStart)} – ${fmtDateFi(new Date(rangeEnd - 86400000))}`;
+    `${tasks.length} työtä  ·  ${fmtDateFi(minStart)} – ${fmtDateFi(maxEnd)}`;
   document.getElementById('todayLabel').textContent = `Tänään: ${fmtDateFi(today)}`;
   document.getElementById('footerNote').textContent =
     `Luotu ${fmtDateFi(today)}`;
@@ -819,6 +934,10 @@ document.getElementById('reloadBtn').addEventListener('click', () => {
 });
 
 document.getElementById('printBtn').addEventListener('click', () => window.print());
+
+document.getElementById('projectTitle').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); }
+});
 
 // ============================================================
 // PNG export — serialize SVG to canvas
