@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>jdbc-prof op: schema-extend</title>
+<style>
+:root {
+  --fg: #1b1f23;
+  --fg-muted: #57606a;
+  --bg: #ffffff;
+  --bg-alt: #f6f8fa;
+  --border: #d0d7de;
+  --accent: #0969da;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 24px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.45;
+}
+nav.back { margin-bottom: 16px; font-size: 13px; }
+nav.back a { color: var(--accent); text-decoration: none; }
+nav.back a:hover { text-decoration: underline; }
+h1 { margin: 0 0 4px 0; font-size: 20px; }
+h2 { margin: 24px 0 10px 0; font-size: 15px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+.meta { color: var(--fg-muted); font-size: 13px; margin-bottom: 16px; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th, td {
+  text-align: left;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+th { background: var(--bg-alt); font-weight: 600; font-size: 11px;
+     text-transform: uppercase; letter-spacing: 0.04em; }
+th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr:nth-child(even) td { background: var(--bg-alt); }
+tr.inv-divider td {
+  background: var(--bg);
+  border-top: 2px solid var(--accent);
+  border-bottom: none;
+  padding: 8px 8px 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+code.sql, code.site { font-family: var(--mono); font-size: 12px; }
+code.sql { white-space: pre-wrap; word-break: break-word; }
+.muted { color: var(--fg-muted); }
+/* Hero split bar at the top of each drill-down: big, labelled. */
+.split-hero {
+  display: flex;
+  width: 100%;
+  height: 22px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--border);
+  margin: 8px 0 16px 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: #fff;
+}
+.split-hero > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  overflow: hidden;
+  padding: 0 8px;
+}
+.split-hero .split-db { background: #4a90d9; }
+.split-hero .split-app { background: #8a94a0; }
+/* Timeline row with a noticeable gap before it — highlights the
+   non-DB pause so the reader's eye jumps to it. */
+tr.gap-row td {
+  background: #fff8e1 !important;
+  border-top: 2px solid #e2a03f;
+}
+tr.gap-row td:nth-child(2) {
+  font-weight: 700;
+  color: #8a5a00;
+}
+/* Transaction row flagged by the idle-lock detector. */
+tr.tx-flagged td {
+  background: #ffebee !important;
+}
+td.idle-bad { color: #b71c1c; font-weight: 700; }
+/* Row highlighted when reached via #event-N anchor from the
+   main report. Deliberately stronger than gap-row so the
+   targeted row is unambiguous. */
+tr:target td {
+  background: #fff3bf !important;
+  outline: 2px solid #e2a03f;
+  outline-offset: -2px;
+}
+footer { margin-top: 32px; font-size: 12px; color: var(--fg-muted); text-align: center; }
+
+</style>
+</head>
+<body>
+<nav class="back"><a href="../report.html">← back to report</a></nav>
+<h1>op: schema-extend</h1>
+<div class="meta">5 events · 870.00 us wall · 738.30 us DB (85%) · 131.70 us non-DB (15%)</div>
+<div class="split-hero" title="DB 738.30 us · non-DB 131.70 us"><span class="split-db" style="flex:84.8621 0 0">DB 738.30 us</span><span class="split-app" style="flex:15.1379 0 0">non-DB 131.70 us</span></div>
+<h2>Transactions</h2>
+<p class="findings-empty">Autocommit mode — every statement was its own transaction. Group related writes in one explicit transaction (and reads outside it) to cut round-trips.</p>
+<table>
+  <thead><tr><th class="num">#</th><th class="num">duration</th><th class="num">reads</th><th class="num">writes</th><th class="num">max idle</th><th>outcome</th><th>longest template</th></tr></thead>
+  <tbody>
+    <tr><td class="num">1</td><td class="num" data-raw="150300">150.30 us</td><td class="num">0</td><td class="num">1</td><td class="num muted" data-raw="0">—</td><td>autocommit</td><td><code class="sql">MERGE INTO SETTINGS (K, V) KEY(K) VALUES (?, ?)</code></td></tr>
+    <tr><td class="num">2</td><td class="num" data-raw="53500">53.50 us</td><td class="num">0</td><td class="num">1</td><td class="num muted" data-raw="0">—</td><td>autocommit</td><td><code class="sql">MERGE INTO SETTINGS (K, V) KEY(K) VALUES (?, ?)</code></td></tr>
+    <tr><td class="num">3</td><td class="num" data-raw="54600">54.60 us</td><td class="num">0</td><td class="num">1</td><td class="num muted" data-raw="0">—</td><td>autocommit</td><td><code class="sql">MERGE INTO SETTINGS (K, V) KEY(K) VALUES (?, ?)</code></td></tr>
+  </tbody>
+</table>
+<h2>Timeline</h2>
+<p class="meta"><strong>gap</strong> is idle time since the previous event on the same thread — highlighted rows had <em>noticeably more</em> app/non-DB time before them than the rest. Follow those to find where the op lost its wall-clock time outside the database.</p>
+<table>
+  <thead><tr><th class="num">+offset</th><th class="num">gap</th><th>event</th><th class="num">duration</th><th>template</th><th>params</th><th>call-site</th></tr></thead>
+  <tbody>
+    <tr id="event-1"><td class="num" data-raw="0">0 ns</td><td class="num muted" data-raw="0">—</td><td>PREPARE</td><td class="num" data-raw="479600">479.60 us</td><td><code class="sql">MERGE INTO SETTINGS (K, V) KEY(K) VALUES (?, ?)</code></td><td><span class="muted">—</span></td><td><code class="site">fi.vesas.jdbclens.capture.CapturingConnection.wrapPrepared:66</code></td></tr>
+    <tr id="event-2"><td class="num" data-raw="531800">531.80 us</td><td class="num" data-raw="52200">52.20 us</td><td>EXECUTE_UPDATE</td><td class="num" data-raw="150300">150.30 us</td><td><code class="sql">MERGE INTO SETTINGS (K, V) KEY(K) VALUES (?, ?)</code></td><td><code class="sql">[1] currency_label_EUR, [2] Euro</code></td><td><code class="site">fi.vesas.jdbclens.sample.cobol.CodeLookupService.seedCodes:33</code></td></tr>
+    <tr id="event-3"><td class="num" data-raw="713500">713.50 us</td><td class="num" data-raw="31400">31.40 us</td><td>EXECUTE_UPDATE</td><td class="num" data-raw="53500">53.50 us</td><td><code class="sql">MERGE INTO SETTINGS (K, V) KEY(K) VALUES (?, ?)</code></td><td><code class="sql">[1] status_label_OPEN, [2] Open</code></td><td><code class="site">fi.vesas.jdbclens.sample.cobol.CodeLookupService.seedCodes:35</code></td></tr>
+    <tr id="event-4"><td class="num" data-raw="792600">792.60 us</td><td class="num" data-raw="25600">25.60 us</td><td>EXECUTE_UPDATE</td><td class="num" data-raw="54600">54.60 us</td><td><code class="sql">MERGE INTO SETTINGS (K, V) KEY(K) VALUES (?, ?)</code></td><td><code class="sql">[1] shipping_label_STD, [2] Standard</code></td><td><code class="site">fi.vesas.jdbclens.sample.cobol.CodeLookupService.seedCodes:37</code></td></tr>
+    <tr id="event-5"><td class="num" data-raw="869700">869.70 us</td><td class="num" data-raw="22500">22.50 us</td><td>CLOSE</td><td class="num" data-raw="300">300 ns</td><td><span class="muted">—</span></td><td><span class="muted">—</span></td><td><code class="site">stack[-1]</code></td></tr>
+  </tbody>
+</table>
+<footer>Generated by jdbc-prof analyze</footer>
+</body>
+</html>
