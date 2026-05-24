@@ -484,94 +484,31 @@
   }
   .pill-link:hover::after { transform: translate(2px, -2px); }
 
-  /* ===== DATASTRIP (binary ticker between hero & projects) ===== */
-  .datastrip {
+  /* ===== DATASTREAM (hairline divider with occasional binary packets) ===== */
+  .datastream {
     position: relative;
-    margin: 0 0 96px;
-    padding: 16px 0;
-    border-top: 1px solid rgba(0, 240, 255, 0.22);
-    border-bottom: 1px solid rgba(0, 240, 255, 0.22);
-    background:
-      linear-gradient(180deg, rgba(0, 240, 255, 0.04), rgba(0, 240, 255, 0.0) 40%, rgba(0, 240, 255, 0.04)),
-      rgba(5, 6, 10, 0.55);
+    height: 36px;
+    margin: 0 0 88px;
     overflow: hidden;
-    font-family: 'JetBrains Mono', monospace;
-    user-select: none;
-    box-shadow:
-      0 0 24px rgba(0, 240, 255, 0.08),
-      inset 0 0 40px rgba(0, 240, 255, 0.04);
-  }
-  .datastrip::before {
-    /* Tick marks along the top inner edge */
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background-image: linear-gradient(90deg, var(--cyan) 0, var(--cyan) 1px, transparent 1px, transparent 32px);
-    background-size: 32px 4px;
-    opacity: 0.35;
     pointer-events: none;
   }
-  .datastrip-rows {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .datastrip-row {
-    overflow: hidden;
-    white-space: nowrap;
-    font-size: 13px;
-    letter-spacing: 0.18em;
-    line-height: 1.4;
-    position: relative;
-    mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
-    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
-  }
-  .datastrip-row .track {
-    display: inline-block;
-    color: rgba(0, 240, 255, 0.55);
-    text-shadow: 0 0 4px rgba(0, 240, 255, 0.5);
-    will-change: transform;
-  }
-  .datastrip-row[data-dir="left"] .track {
-    animation: ds-left var(--ds-dur, 50s) linear infinite;
-  }
-  .datastrip-row[data-dir="right"] .track {
-    animation: ds-right var(--ds-dur, 50s) linear infinite;
-  }
-  @keyframes ds-left {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-  @keyframes ds-right {
-    0% { transform: translateX(-50%); }
-    100% { transform: translateX(0); }
-  }
-  .datastrip-row.middle .track {
-    color: rgba(0, 240, 255, 0.85);
-    font-size: 15px;
-    font-weight: 500;
-    text-shadow:
-      0 0 4px rgba(0, 240, 255, 0.6),
-      0 0 10px rgba(0, 240, 255, 0.3);
-  }
-  .datastrip-row .hi {
-    color: var(--lime);
-    text-shadow: 0 0 6px var(--lime), 0 0 14px rgba(200, 255, 0, 0.55);
-  }
-  .datastrip-row .mg {
-    color: var(--magenta);
-    text-shadow: 0 0 6px var(--magenta), 0 0 14px rgba(255, 42, 109, 0.55);
-  }
-  .datastrip-row .br {
-    color: #fff;
-    text-shadow: 0 0 6px var(--cyan), 0 0 14px var(--cyan), 0 0 22px rgba(0, 240, 255, 0.8);
+  .datastream-line {
+    position: absolute;
+    top: 50%;
+    /* Line stops just inside the label chips on both sides */
+    left: 170px;
+    right: 130px;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      rgba(0, 240, 255, 0.22) 0%,
+      rgba(0, 240, 255, 0.22) 100%
+    );
+    box-shadow: 0 0 4px rgba(0, 240, 255, 0.15);
   }
 
-  /* Side label chips */
-  .datastrip-label {
+  /* End-cap label chips */
+  .datastream-label {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -584,23 +521,61 @@
     padding: 5px 14px;
     text-transform: uppercase;
     font-weight: 500;
-    box-shadow: 0 0 14px rgba(0, 240, 255, 0.55);
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.45);
   }
-  .datastrip-label--left {
+  .datastream-label--left {
     left: 0;
     clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
     padding-right: 22px;
   }
-  .datastrip-label--right {
+  .datastream-label--right {
     right: 0;
     clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%);
     padding-left: 22px;
   }
-
   @media (max-width: 600px) {
-    .datastrip-label { display: none; }
-    .datastrip-row { font-size: 11px; }
-    .datastrip-row.middle .track { font-size: 12px; }
+    .datastream-line { left: 0; right: 0; }
+    .datastream-label { display: none; }
+  }
+  /* Continuous binary flow between the end-cap chips */
+  .datastream-track {
+    position: absolute;
+    top: 50%;
+    left: 170px;
+    right: 130px;
+    height: 20px;
+    transform: translateY(-50%);
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+  }
+  .datastream-flow {
+    display: inline-block;
+    white-space: nowrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    line-height: 20px;
+    color: rgba(0, 240, 255, 0.6);
+    text-shadow: 0 0 4px rgba(0, 240, 255, 0.4);
+    animation: ds-flow 480s linear infinite;
+    will-change: transform;
+  }
+  .datastream-flow .hi {
+    color: var(--lime);
+    text-shadow: 0 0 6px var(--lime), 0 0 12px rgba(200, 255, 0, 0.5);
+  }
+  .datastream-flow .mg {
+    color: var(--magenta);
+    text-shadow: 0 0 6px var(--magenta), 0 0 12px rgba(255, 42, 109, 0.5);
+  }
+  .datastream-flow .br {
+    color: #fff;
+    text-shadow: 0 0 6px var(--cyan), 0 0 14px var(--cyan), 0 0 20px rgba(0, 240, 255, 0.65);
+  }
+  @keyframes ds-flow {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
   }
 
   /* ===== SECTION HEADER ===== */  .section {

@@ -281,8 +281,8 @@
       { text: 'For many years I\u2019ve worked across Finnish finance and insurance, on' },
       { text: 'internet banking, system integrations, and various enterprise systems.' },
       { text: '' },
-      { text: 'Current focus: AI-assisted engineering, legacy modernization, performance,' },
-      { text: 'and integrating LLMs into existing systems.' },
+      { text: 'Current focus: legacy modernization, performance, and integrating' },
+      { text: 'LLMs into existing systems.' },
       { prompt: '$', text: '', cursor: true }
     ];
 
@@ -371,31 +371,47 @@
     }
   })();
 
-  // ============ DATASTRIP (binary scroll) ============
+  // ============ DATASTREAM (continuous calm binary flow) ============
+  // The stream encodes a real ASCII message, 8 bits per byte, grouped by &nbsp;.
+  // Decode any 8-bit chunk to read it back.
   (function () {
-    const tracks = document.querySelectorAll('.datastrip-row .track');
-    if (!tracks.length) return;
+    const flow = document.querySelector('.datastream-flow');
+    if (!flow) return;
 
-    function makeBinary(len) {
+    const SOURCE =
+      'VESA SAARINEN // SOLUTION ARCHITECT // ' +
+      'LEGACY MODERNIZATION // LLM INTEGRATION // PERFORMANCE // ' +
+      'JDBC LENS // COBOL TO JAVA // ARCH AUDIT // ' +
+      'OMASTOPPI // ECONSTATS // JAVARAYS // ' +
+      'HELSINKI FINLAND // VESAS.FI // ';
+
+    // ASCII -> 8-bit binary string
+    function toBits(s) {
       let out = '';
-      for (let i = 0; i < len; i++) {
-        const bit = Math.random() < 0.5 ? '0' : '1';
+      for (let i = 0; i < s.length; i++) {
+        out += s.charCodeAt(i).toString(2).padStart(8, '0');
+      }
+      return out;
+    }
+
+    // Style each bit (occasional accent color), group every 8 bits with a space.
+    function styleBits(bits) {
+      let out = '';
+      for (let i = 0; i < bits.length; i++) {
+        const bit = bits[i];
         const r = Math.random();
-        if (r < 0.04) out += '<span class="hi">' + bit + '</span>';
-        else if (r < 0.07) out += '<span class="mg">' + bit + '</span>';
-        else if (r < 0.13) out += '<span class="br">' + bit + '</span>';
-        else out += bit;
-        // Group every 8 bits with a space
+        if (r < 0.025)     out += '<span class="hi">' + bit + '</span>';
+        else if (r < 0.045) out += '<span class="mg">' + bit + '</span>';
+        else if (r < 0.09)  out += '<span class="br">' + bit + '</span>';
+        else                out += bit;
         if ((i + 1) % 8 === 0) out += '&nbsp;';
       }
       return out;
     }
 
-    tracks.forEach((track) => {
-      const content = makeBinary(260);
-      // Duplicate for seamless infinite scroll (animation translates -50%)
-      track.innerHTML = content + content;
-    });
+    const styled = styleBits(toBits(SOURCE));
+    // Duplicate for seamless loop (animation translates -50%).
+    flow.innerHTML = styled + styled;
   })();
 
   // ============ TICKER ============
