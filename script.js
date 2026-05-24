@@ -281,8 +281,8 @@
       { text: 'For many years I\u2019ve worked across Finnish finance and insurance, on' },
       { text: 'internet banking, system integrations, and various enterprise systems.' },
       { text: '' },
-      { text: 'Current focus: AI-assisted engineering, legacy modernization, performance,' },
-      { text: 'and integrating LLMs into existing systems.' },
+      { text: 'Current focus: legacy modernization, performance, AI-assisted' },
+      { text: 'engineering, and integrating LLMs into existing systems.' },
       { prompt: '$', text: '', cursor: true }
     ];
 
@@ -380,7 +380,7 @@
 
     const SOURCE =
       'VESA SAARINEN // SOLUTION ARCHITECT // ' +
-      'LEGACY MODERNIZATION // LLM INTEGRATION // PERFORMANCE // ' +
+      'LEGACY MODERNIZATION // AI-ASSISTED ENGINEERING // LLM INTEGRATION // PERFORMANCE // ' +
       'JDBC LENS // COBOL TO JAVA // ARCH AUDIT // ' +
       'OMASTOPPI // ECONSTATS // JAVARAYS // ' +
       'HELSINKI FINLAND // VESAS.FI // ';
