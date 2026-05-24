@@ -402,7 +402,6 @@
     background: var(--card-bg);
     border: 1px solid var(--line);
     border-left: 2px solid var(--cyan);
-    padding: 24px 28px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 14px;
     line-height: 1.7;
@@ -410,29 +409,45 @@
     position: relative;
     backdrop-filter: blur(4px);
   }
-  .hero-terminal::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 24px;
-    background: linear-gradient(90deg, rgba(0, 240, 255, 0.08), transparent);
-  }
   .terminal-header {
     font-size: 11px;
-    color: var(--fg-faint);
-    letter-spacing: 0.1em;
+    color: var(--fg-dim);
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    margin-bottom: 12px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 9px 16px 9px 14px;
+    background: linear-gradient(90deg, rgba(0, 240, 255, 0.12), rgba(0, 240, 255, 0.02));
+    border-bottom: 1px solid var(--line);
+  }
+  .terminal-header .path {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--cyan);
+  }
+  .terminal-header .path::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    background: var(--lime);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--lime);
+    flex: none;
+  }
+  .terminal-header .status {
+    color: var(--fg-faint);
+  }
+  #termOut {
+    padding: 18px 22px 22px;
   }
   .terminal-prompt {
     color: var(--cyan);
     margin-right: 8px;
   }
-  .terminal-line { color: var(--fg); }
+  .terminal-line { color: var(--fg); min-height: 1.7em; }
   .terminal-cursor {
     display: inline-block;
     width: 8px;

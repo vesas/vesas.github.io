@@ -288,20 +288,21 @@
       { prompt: '$', text: '', cursor: true }
     ];
 
-    let lineIdx = 0;
-    let charIdx = 0;
-    let currentEl = null;
-
-    function nextLine() {
-      if (lineIdx >= lines.length) return;
-      const ln = lines[lineIdx];
+    // Pre-build all line rows so the terminal occupies its final size
+    // from the start — no reflow as text streams in. Each row has the
+    // prompt/indent visible immediately and an empty text span we type into.
+    const rowEls = lines.map((ln) => {
       const row = document.createElement('div');
       row.className = 'terminal-line';
+      let promptEl = null;
       if (ln.prompt) {
-        const p = document.createElement('span');
-        p.className = 'terminal-prompt';
-        p.textContent = ln.prompt + ' ';
-        row.appendChild(p);
+        promptEl = document.createElement('span');
+        promptEl.className = 'terminal-prompt';
+        promptEl.textContent = ln.prompt + ' ';
+        // Keep the prompt's space reserved but invisible until this line's turn —
+        // a fresh terminal shouldn't already have a wall of $ signs.
+        promptEl.style.visibility = 'hidden';
+        row.appendChild(promptEl);
       } else {
         const indent = document.createElement('span');
         indent.style.color = 'var(--fg-faint)';
@@ -310,22 +311,41 @@
       }
       const span = document.createElement('span');
       row.appendChild(span);
+      // Reserve baseline height for empty lines too (so the box keeps its
+      // shape even before any typing has reached them).
+      if (!ln.text && !ln.prompt) {
+        const ghost = document.createElement('span');
+        ghost.textContent = '\u00A0';
+        ghost.style.visibility = 'hidden';
+        row.appendChild(ghost);
+      }
       out.appendChild(row);
-      currentEl = span;
+      return { row, span, promptEl };
+    });
+
+    let lineIdx = 0;
+    let charIdx = 0;
+
+    function nextLine() {
+      if (lineIdx >= lines.length) return;
+      const ln = lines[lineIdx];
+      const row = rowEls[lineIdx];
+      if (row.promptEl) row.promptEl.style.visibility = 'visible';
       charIdx = 0;
       typeChar(ln);
     }
 
     function typeChar(ln) {
+      const target = rowEls[lineIdx].span;
       if (charIdx < ln.text.length) {
-        currentEl.textContent += ln.text[charIdx++];
+        target.textContent += ln.text[charIdx++];
         const delay = ln.prompt ? 38 : (Math.random() * 10 + 8);
         setTimeout(() => typeChar(ln), delay);
       } else {
         if (ln.cursor) {
           const c = document.createElement('span');
           c.className = 'terminal-cursor';
-          currentEl.appendChild(c);
+          target.appendChild(c);
         }
         lineIdx++;
         setTimeout(nextLine, ln.prompt ? 250 : 60);
