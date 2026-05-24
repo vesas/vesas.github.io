@@ -98,6 +98,167 @@
     tick();
   })();
 
+  // ============ DECRYPT EFFECTS (titles) ============
+  (function () {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const POOL = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
+    const FLASH_CLASSES = ['flash-cyan', 'flash-cyan', 'flash-lime', 'flash-magenta']; // cyan biased
+    const randGlyph = () => POOL[(Math.random() * POOL.length) | 0];
+
+    function setupSpans(el) {
+      const text = el.textContent;
+      el.setAttribute('aria-label', text);
+      el.textContent = '';
+      const chars = [];
+      for (let i = 0; i < text.length; i++) {
+        const span = document.createElement('span');
+        span.className = 'decrypt-char';
+        span.setAttribute('aria-hidden', 'true');
+        const ch = text[i];
+        span.textContent = ch === ' ' ? '\u00A0' : ch;
+        el.appendChild(span);
+        chars.push({ span, final: ch, settled: false, lastSwap: 0, settleAt: 0 });
+      }
+      // Lock each char span to its natural Latin width. Any wider glyph (katakana)
+      // will visually overflow the span without affecting siblings or wrapping.
+      chars.forEach((c) => {
+        const w = c.span.getBoundingClientRect().width;
+        c.span.style.width = w + 'px';
+      });
+      el._decryptChars = chars;
+      return chars;
+    }
+
+    function initialDecrypt(el) {
+      if (reduced) {
+        const chars = setupSpans(el);
+        chars.forEach((c) => {
+          c.settled = true;
+          c.span.textContent = c.final === ' ' ? '\u00A0' : c.final;
+          c.span.classList.add('settled');
+        });
+        scheduleMiniGlitch(el);
+        return;
+      }
+
+      const chars = setupSpans(el);
+      chars.forEach((c, i) => {
+        c.settleAt = i * 55 + 420 + Math.random() * 360;
+        if (c.final === ' ') {
+          c.settled = true;
+          c.span.classList.add('settled');
+        }
+      });
+
+      const start = performance.now();
+      function frame(now) {
+        const t = now - start;
+        let allDone = true;
+        for (const c of chars) {
+          if (c.settled) continue;
+          if (t >= c.settleAt) {
+            c.span.textContent = c.final;
+            c.span.classList.add('settled');
+            c.settled = true;
+          } else {
+            allDone = false;
+            if (now - c.lastSwap >= 65) {
+              c.span.textContent = randGlyph();
+              c.lastSwap = now;
+            }
+          }
+        }
+        if (allDone) {
+          scheduleMiniGlitch(el);
+        } else {
+          requestAnimationFrame(frame);
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+
+    function miniGlitch(el) {
+      const chars = el._decryptChars;
+      if (!chars) return;
+
+      const candidates = chars.filter((c) => c.final !== ' ' && !c._glitching);
+      if (!candidates.length) return;
+
+      const count = 1 + ((Math.random() * Math.min(3, candidates.length)) | 0);
+      const picks = [];
+      while (picks.length < count) {
+        const c = candidates[(Math.random() * candidates.length) | 0];
+        if (!picks.includes(c)) picks.push(c);
+      }
+
+      const flashClass = FLASH_CLASSES[(Math.random() * FLASH_CLASSES.length) | 0];
+
+      picks.forEach((c) => {
+        c._glitching = true;
+        c.span.classList.add(flashClass);
+        const duration = 220 + Math.random() * 240;
+        const start = performance.now();
+        let last = 0;
+        function tick(now) {
+          const t = now - start;
+          if (t >= duration) {
+            c.span.textContent = c.final;
+            c.span.classList.remove(flashClass);
+            c._glitching = false;
+            return;
+          }
+          if (now - last >= 55) {
+            c.span.textContent = randGlyph();
+            last = now;
+          }
+          requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      });
+    }
+
+    function scheduleMiniGlitch(el) {
+      if (reduced) return;
+      const delay = 8000 + Math.random() * 14000; // 8–22s per element
+      setTimeout(() => {
+        const rect = el.getBoundingClientRect();
+        const visible = rect.bottom > 0 && rect.top < window.innerHeight;
+        if (visible && !document.hidden) miniGlitch(el);
+        scheduleMiniGlitch(el);
+      }, delay);
+    }
+
+    function observeAll() {
+      const titles = document.querySelectorAll('.section-title, .project-title');
+      if (!titles.length) return;
+      if ('IntersectionObserver' in window) {
+        const obs = new IntersectionObserver((entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting && !entry.target.dataset.decrypted) {
+              entry.target.dataset.decrypted = '1';
+              initialDecrypt(entry.target);
+              obs.unobserve(entry.target);
+            }
+          }
+        }, { threshold: 0.6, rootMargin: '0px 0px -10% 0px' });
+        titles.forEach((t) => {
+          if (!t.dataset.decrypted) obs.observe(t);
+        });
+      } else {
+        titles.forEach((t) => {
+          if (!t.dataset.decrypted) {
+            t.dataset.decrypted = '1';
+            initialDecrypt(t);
+          }
+        });
+      }
+    }
+
+    // Exposed so projects render can call after appending cards.
+    window.__decryptObserveAll = observeAll;
+    observeAll();
+  })();
+
   // ============ CLOCK ============
   (function () {
     const el = document.getElementById('clock');
@@ -202,6 +363,38 @@
         </div>
       `;
       grid.appendChild(card);
+    });
+
+    // Now that .project-title nodes exist, ask the decrypt observer to pick them up.
+    if (typeof window.__decryptObserveAll === 'function') {
+      window.__decryptObserveAll();
+    }
+  })();
+
+  // ============ DATASTRIP (binary scroll) ============
+  (function () {
+    const tracks = document.querySelectorAll('.datastrip-row .track');
+    if (!tracks.length) return;
+
+    function makeBinary(len) {
+      let out = '';
+      for (let i = 0; i < len; i++) {
+        const bit = Math.random() < 0.5 ? '0' : '1';
+        const r = Math.random();
+        if (r < 0.04) out += '<span class="hi">' + bit + '</span>';
+        else if (r < 0.07) out += '<span class="mg">' + bit + '</span>';
+        else if (r < 0.13) out += '<span class="br">' + bit + '</span>';
+        else out += bit;
+        // Group every 8 bits with a space
+        if ((i + 1) % 8 === 0) out += '&nbsp;';
+      }
+      return out;
+    }
+
+    tracks.forEach((track) => {
+      const content = makeBinary(260);
+      // Duplicate for seamless infinite scroll (animation translates -50%)
+      track.innerHTML = content + content;
     });
   })();
 
