@@ -24,8 +24,10 @@
     let firstMove = false;
 
     function findTarget(e) {
+      const target = e.target;
+      if (!target || typeof target.closest !== 'function') return null;
       for (const t of TARGETS) {
-        const el = e.target.closest(t.sel);
+        const el = target.closest(t.sel);
         if (el) return { el, getLabel: t.label };
       }
       return null;

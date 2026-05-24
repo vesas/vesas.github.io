@@ -533,10 +533,6 @@
     clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%);
     padding-left: 22px;
   }
-  @media (max-width: 600px) {
-    .datastream-line { left: 0; right: 0; }
-    .datastream-label { display: none; }
-  }
   /* Continuous binary flow between the end-cap chips */
   .datastream-track {
     position: absolute;
@@ -576,6 +572,14 @@
   @keyframes ds-flow {
     0%   { transform: translateX(0); }
     100% { transform: translateX(-50%); }
+  }
+  @media (max-width: 600px) {
+    .datastream-line,
+    .datastream-track {
+      left: 0;
+      right: 0;
+    }
+    .datastream-label { display: none; }
   }
 
   /* ===== SECTION HEADER ===== */  .section {
