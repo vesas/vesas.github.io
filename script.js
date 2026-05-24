@@ -281,8 +281,8 @@
       { text: 'For many years I\u2019ve worked across Finnish finance and insurance, on' },
       { text: 'internet banking, system integrations, and various enterprise systems.' },
       { text: '' },
-      { text: 'Current focus: legacy modernization, performance, and integrating' },
-      { text: 'LLMs into existing systems.' },
+      { text: 'Current focus: AI-assisted engineering, legacy modernization, performance,' },
+      { text: 'and integrating LLMs into existing systems.' },
       { prompt: '$', text: '', cursor: true }
     ];
 
