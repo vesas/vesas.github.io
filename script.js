@@ -64,6 +64,7 @@
       } else if (lockedEl) {
         releaseLock();
       }
+      startAnimation();
     }, { passive: true });
 
     // Re-measure on scroll/resize while locked so brackets stay glued
@@ -84,20 +85,37 @@
       reticle.classList.remove('visible');
     });
     document.addEventListener('mouseenter', () => {
-      if (firstMove) reticle.classList.add('visible');
+      if (firstMove) { reticle.classList.add('visible'); startAnimation(); }
     });
 
-    // Smooth-follow when idle (not locked)
+    // Smooth-follow when idle (not locked) — demand-driven, self-terminating
+    let animating = false;
+
     function tick() {
-      if (!lockedEl) {
+      if (!lockedEl && firstMove) {
         smoothX += (cursorX - smoothX) * 0.35;
         smoothY += (cursorY - smoothY) * 0.35;
         reticle.style.left = smoothX + 'px';
         reticle.style.top = smoothY + 'px';
+
+        if (Math.abs(cursorX - smoothX) > 0.5 || Math.abs(cursorY - smoothY) > 0.5) {
+          requestAnimationFrame(tick);
+          return;
+        }
+        smoothX = cursorX;
+        smoothY = cursorY;
+        reticle.style.left = smoothX + 'px';
+        reticle.style.top = smoothY + 'px';
       }
-      requestAnimationFrame(tick);
+      animating = false;
     }
-    tick();
+
+    function startAnimation() {
+      if (!animating) {
+        animating = true;
+        requestAnimationFrame(tick);
+      }
+    }
   })();
 
   // ============ DECRYPT EFFECTS (titles) ============
