@@ -53,16 +53,21 @@
       lockedEl = null;
     }
 
+    let lastLockCheck = 0;
     document.addEventListener('mousemove', (e) => {
       cursorX = e.clientX;
       cursorY = e.clientY;
       if (!firstMove) { firstMove = true; reticle.classList.add('visible'); smoothX = cursorX; smoothY = cursorY; }
 
-      const found = findTarget(e);
-      if (found) {
-        if (found.el !== lockedEl) applyLock(found);
-      } else if (lockedEl) {
-        releaseLock();
+      const now = performance.now();
+      if (now - lastLockCheck > 100) {
+        lastLockCheck = now;
+        const found = findTarget(e);
+        if (found) {
+          if (found.el !== lockedEl) applyLock(found);
+        } else if (lockedEl) {
+          releaseLock();
+        }
       }
       startAnimation();
     }, { passive: true });
@@ -95,11 +100,15 @@
 
     // Smooth-follow when idle (not locked) — demand-driven, self-terminating
     let animating = false;
+    let lastTime = 0;
 
-    function tick() {
+    function tick(now) {
       if (!lockedEl && firstMove) {
-        smoothX += (cursorX - smoothX) * 0.35;
-        smoothY += (cursorY - smoothY) * 0.35;
+        const dt = Math.min(now - (lastTime || now), 50);
+        lastTime = now;
+        const factor = 1 - Math.exp(-12 * dt / 1000);
+        smoothX += (cursorX - smoothX) * factor;
+        smoothY += (cursorY - smoothY) * factor;
         reticle.style.left = smoothX + 'px';
         reticle.style.top = smoothY + 'px';
 
@@ -113,6 +122,7 @@
         reticle.style.top = smoothY + 'px';
       }
       animating = false;
+      lastTime = 0;
     }
 
     function startAnimation() {
@@ -317,9 +327,7 @@
       { prompt: '$', text: '', cursor: true }
     ];
 
-    // Pre-build all line rows so the terminal occupies its final size
-    // from the start — no reflow as text streams in. Each row has the
-    // prompt/indent visible immediately and an empty text span we type into.
+    const termFragment = document.createDocumentFragment();
     const rowEls = lines.map((ln) => {
       const row = document.createElement('div');
       row.className = 'terminal-line';
@@ -348,9 +356,10 @@
         ghost.style.visibility = 'hidden';
         row.appendChild(ghost);
       }
-      out.appendChild(row);
+      termFragment.appendChild(row);
       return { row, span, promptEl };
     });
+    out.appendChild(termFragment);
 
     let lineIdx = 0;
     let charIdx = 0;
@@ -389,12 +398,13 @@
     const data = JSON.parse(document.getElementById('projects-data').textContent);
     const grid = document.getElementById('projectsGrid');
 
+    const fragment = document.createDocumentFragment();
     data.forEach((p) => {
       const card = document.createElement('article');
       card.className = 'project-card';
       card.innerHTML = `
         <div class="project-img-wrap">
-          <img src="${p.img}" alt="" loading="lazy" />
+          <img src="${p.img}" alt="" loading="lazy" width="800" height="450" />
           <div class="project-img-overlay"></div>
           <div class="project-img-corners"><span></span></div>
           <div class="project-id">PRJ-${p.id}</div>
@@ -413,8 +423,9 @@
           ` : ''}
         </div>
       `;
-      grid.appendChild(card);
+      fragment.appendChild(card);
     });
+    grid.appendChild(fragment);
 
     // Now that .project-title nodes exist, ask the decrypt observer to pick them up.
     if (typeof window.__decryptObserveAll === 'function') {
