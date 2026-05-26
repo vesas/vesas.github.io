@@ -68,15 +68,20 @@
     }, { passive: true });
 
     // Re-measure on scroll/resize while locked so brackets stay glued
+    let relockScheduled = false;
     function relock() {
-      if (lockedEl) {
+      if (!lockedEl || relockScheduled) return;
+      relockScheduled = true;
+      requestAnimationFrame(() => {
+        relockScheduled = false;
+        if (!lockedEl) return;
         const r = lockedEl.getBoundingClientRect();
         const pad = 8;
         reticle.style.left = (r.left + r.width / 2) + 'px';
         reticle.style.top = (r.top + r.height / 2) + 'px';
         reticle.style.width = (r.width + pad * 2) + 'px';
         reticle.style.height = (r.height + pad * 2) + 'px';
-      }
+      });
     }
     window.addEventListener('scroll', relock, { passive: true });
     window.addEventListener('resize', relock);
@@ -141,10 +146,8 @@
       }
       // Lock each char span to its natural Latin width. Any wider glyph (katakana)
       // will visually overflow the span without affecting siblings or wrapping.
-      chars.forEach((c) => {
-        const w = c.span.getBoundingClientRect().width;
-        c.span.style.width = w + 'px';
-      });
+      const widths = chars.map((c) => c.span.getBoundingClientRect().width);
+      chars.forEach((c, i) => { c.span.style.width = widths[i] + 'px'; });
       el._decryptChars = chars;
       return chars;
     }
@@ -241,9 +244,17 @@
       if (reduced) return;
       const delay = 8000 + Math.random() * 14000; // 8–22s per element
       setTimeout(() => {
+        if (document.hidden) {
+          const resume = () => {
+            document.removeEventListener('visibilitychange', resume);
+            scheduleMiniGlitch(el);
+          };
+          document.addEventListener('visibilitychange', resume);
+          return;
+        }
         const rect = el.getBoundingClientRect();
         const visible = rect.bottom > 0 && rect.top < window.innerHeight;
-        if (visible && !document.hidden) miniGlitch(el);
+        if (visible) miniGlitch(el);
         scheduleMiniGlitch(el);
       }, delay);
     }
