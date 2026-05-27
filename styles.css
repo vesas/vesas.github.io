@@ -991,8 +991,6 @@
     .hero-name .glitch::before,
     .hero-name .glitch::after,
     .terminal-cursor,
-    .datastream-flow,
-    .ticker-track,
     .reticle.locked .ret-scan {
       animation: none !important;
     }
