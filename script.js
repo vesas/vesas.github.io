@@ -404,7 +404,7 @@
       card.className = 'project-card';
       card.innerHTML = `
         <div class="project-img-wrap">
-          <img src="${p.img}" alt="" loading="lazy" width="800" height="450" />
+          <img src="${p.img}" alt="Screenshot of ${p.title}" loading="lazy" width="800" height="450" />
           <div class="project-img-overlay"></div>
           <div class="project-img-corners"><span></span></div>
           <div class="project-id">PRJ-${p.id}</div>
