@@ -11,6 +11,7 @@
         return 'LOCK · ' + (id ? id.textContent.trim() : 'PROJECT');
       }},
       { sel: '.writing-item', label: () => 'LOCK · ARTICLE' },
+      { sel: '.game-item', label: () => 'LOCK · GAME' },
       { sel: '.pill-link', label: (el) => 'LINK · ' + el.textContent.trim().toUpperCase() },
       { sel: '.hero-name', label: () => 'LOCK · IDENT' },
       { sel: '.project-links a', label: (el) => 'LINK · ' + el.textContent.replace(/[↗:]/g,'').trim().toUpperCase().slice(0, 18) }
