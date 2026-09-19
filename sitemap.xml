@@ -5,4 +5,14 @@
     <lastmod>2026-09-19</lastmod>
     <priority>1.0</priority>
   </url>
+  <url>
+    <loc>https://vesas.fi/cobol/modernizer.html</loc>
+    <lastmod>2026-09-19</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://vesas.fi/jdbclens/report.html</loc>
+    <lastmod>2026-09-19</lastmod>
+    <priority>0.6</priority>
+  </url>
 </urlset>

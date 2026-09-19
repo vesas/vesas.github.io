@@ -124,38 +124,36 @@
   requestAnimationFrame(frame);
 })();
 
-// ============ PROJECTS ============
+// ============ WORK TABLE ============
 (function () {
   const dataEl = document.getElementById('projects-data');
-  const grid = document.getElementById('projectsGrid');
-  if (!dataEl || !grid) return;
+  const body = document.getElementById('workRows');
+  if (!dataEl || !body) return;
 
   const data = JSON.parse(dataEl.textContent);
   const fragment = document.createDocumentFragment();
 
-  data.forEach((p) => {
-    const card = document.createElement('article');
-    card.className = 'project-card';
-    card.innerHTML = `
-      <div class="project-img-wrap">
-        <img src="${p.img}" alt="Screenshot of ${p.title}" loading="lazy" width="480" height="480"${p.pos ? ` style="object-position:${p.pos}"` : ''} />
-      </div>
-      <div class="project-body">
-        <div class="project-stack">
-          ${p.stack.map(s => `<span class="stack-tag">${s}</span>`).join('')}
-        </div>
-        <h3 class="project-title">${p.title}</h3>
-        <p class="project-desc">${p.desc}</p>
-        <p class="project-why"><span class="label">Why</span>${p.why}</p>
-        ${p.links.length ? `
-          <div class="project-links">
-            ${p.links.map(l => `<a href="${l.href}" target="_blank" rel="noopener">${l.text} ↗</a>`).join('')}
-          </div>
-        ` : ''}
-      </div>
+  data.forEach((p, i) => {
+    // The title carries the primary link where there is one. Projects with
+    // nothing to link to stay plain text rather than pretending otherwise.
+    const primary = p.links[0];
+    const name = primary
+      ? `<a href="${primary.href}" target="_blank" rel="noopener">${p.title}</a>`
+      : p.title;
+    const links = p.links.length
+      ? p.links.map(l => `<a href="${l.href}" target="_blank" rel="noopener">${l.text}</a>`).join('')
+      : '<span class="none">—</span>';
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td class="c-num">${String(i + 1).padStart(2, '0')}</td>
+      <td class="c-name">${name}</td>
+      <td class="c-stack">${p.stack.join(' · ')}</td>
+      <td class="c-desc">${p.short}</td>
+      <td class="c-links">${links}</td>
     `;
-    fragment.appendChild(card);
+    fragment.appendChild(row);
   });
 
-  grid.appendChild(fragment);
+  body.appendChild(fragment);
 })();

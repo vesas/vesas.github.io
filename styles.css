@@ -1,51 +1,52 @@
+/* ==========================================================================
+   vesas.fi — technical document
+
+   Light only. The page is built like a printed engineering report: a masthead
+   with a ruled identification strip, then numbered sections whose running
+   heads sit in the left margin against a single vertical rule.
+   ========================================================================== */
+
 :root {
-  --bg: #0b0d11;
-  --bg-2: #11141a;
-  --fg: #e7eaef;
-  --fg-dim: #9aa5b4;
-  --fg-faint: #7a8594;
-  --accent: #58c4d4;
-  --accent-soft: rgba(88, 196, 212, 0.30);
-  --accent-wash: rgba(88, 196, 212, 0.05);
-  --grid: rgba(88, 196, 212, 0.05);
-  --line: rgba(231, 234, 239, 0.10);
-  --card-bg: rgba(17, 20, 26, 0.70);
+  --bg:        #FAF9F6;   /* warm paper, not pure white */
+  --bg-2:      #F1F0EB;   /* table header fill */
+  --fg:        #15171A;   /* ink */
+  --fg-dim:    #4E5258;
+  --fg-faint:  #6A6E75;
+  --accent:    #0E5E66;   /* deep teal */
+  --accent-soft: rgba(14, 94, 102, 0.32);
+  --row-hover: #EFF3F1;   /* paper with a faint teal cast; opaque on purpose */
+  --line:      rgba(21, 23, 26, 0.16);   /* hairlines */
+  --rule:      #15171A;                  /* full-strength structural rules */
+
+  --maxw:   1180px;
+  --pad:    40px;
+  --head:   208px;        /* the left margin that running heads live in */
+
+  --sans: "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  color-scheme: light;
 }
+
+/* ===== BASE ===== */
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0,0,0,0);
-  white-space: nowrap;
-  border: 0;
-}
-
-html {
-  scroll-behavior: smooth;
-  color-scheme: dark;
-}
+html { scroll-behavior: smooth; }
 
 html, body {
   background: var(--bg);
   color: var(--fg);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-weight: 400;
-  line-height: 1.6;
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
 
-body {
-  min-height: 100vh;
-  min-height: 100dvh;
-  position: relative;
-}
+body { min-height: 100vh; min-height: 100dvh; }
 
 a:focus-visible,
 button:focus-visible {
@@ -53,72 +54,49 @@ button:focus-visible {
   outline-offset: 3px;
 }
 
-/* ===== BACKGROUND ===== */
-
-/* Faint perspective grid along the bottom edge */
-.bg-grid {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-.bg-grid::before {
-  content: "";
+.sr-only {
   position: absolute;
-  left: -50%;
-  right: -50%;
-  bottom: -30vh;
-  height: 70vh;
-  background-image:
-    linear-gradient(var(--grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size: 64px 64px;
-  transform: perspective(600px) rotateX(64deg);
-  transform-origin: center top;
-  animation: grid-pan 34s linear infinite;
-  mask-image: linear-gradient(to bottom, transparent 0%, #000 40%, #000 80%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 40%, #000 80%, transparent 100%);
-}
-@keyframes grid-pan {
-  0% { background-position: 0 0; }
-  100% { background-position: 0 64px; }
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
-/* Single cool glow, top of page */
-.bg-glow {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse 90% 45% at 50% -15%, rgba(88, 196, 212, 0.10), transparent 65%),
-    radial-gradient(ellipse 70% 40% at 15% 105%, rgba(88, 196, 212, 0.05), transparent 65%);
+/* Shared mono label: every small-caps label on the page is this one rule. */
+.label {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
 }
 
 /* ===== TOP BAR ===== */
+
 .topbar {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
   z-index: 50;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+.topbar-inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 12px var(--pad);
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 24px;
-  padding: 14px 32px;
-  background: rgba(11, 13, 17, 0.88);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--line);
 }
-/* The domain, not the name — the hero says the name at 76px right below. */
 .brand {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--mono);
   font-weight: 500;
-  font-size: 13px;
-  letter-spacing: 0.02em;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
   color: var(--fg);
   text-decoration: none;
   white-space: nowrap;
@@ -128,236 +106,166 @@ button:focus-visible {
 .nav {
   display: flex;
   align-items: center;
-  gap: 26px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  letter-spacing: 0.1em;
+  gap: 22px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
 }
 .nav a {
   color: var(--fg-dim);
   text-decoration: none;
-  transition: color 0.2s;
+  transition: color 0.18s;
   white-space: nowrap;
 }
 .nav a:hover { color: var(--accent); }
 .nav .nav-sep {
-  width: 1px;
-  height: 14px;
+  width: 1px; height: 11px;
   background: var(--line);
   flex: none;
 }
 
-/* ===== MAIN CONTAINER ===== */
+/* ===== PAGE ===== */
+
 .page {
-  position: relative;
-  z-index: 2;
-  max-width: 1080px;
+  max-width: var(--maxw);
   margin: 0 auto;
-  padding: 112px 32px 40px;
+  padding: 0 var(--pad);
 }
 
-/* ===== HERO ===== */
-.hero {
-  position: relative;
-  margin-bottom: 96px;
-  padding-top: 36px;
-}
-.hero-name {
+/* ===== MASTHEAD ===== */
+
+.masthead { padding-top: 60px; }
+
+.masthead-name {
+  font-size: clamp(44px, 7.4vw, 88px);
   font-weight: 700;
-  font-size: clamp(40px, 7vw, 76px);
-  line-height: 1.04;
-  letter-spacing: -0.03em;
-  margin-bottom: 14px;
+  line-height: 0.94;
+  letter-spacing: -0.035em;
+  margin-bottom: 36px;
 }
-.hero-role {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 15px;
-  color: var(--fg-dim);
-  margin-bottom: 40px;
-  letter-spacing: 0.02em;
-}
-.hero-role .accent { color: var(--accent); }
 
-.hero-terminal {
-  max-width: 720px;
-  background: var(--card-bg);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  overflow: hidden;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13.5px;
-  line-height: 1.7;
+/* The identification strip: four ruled cells across the full measure. It is
+   the page's anchor, and it replaces the small floating block that used to sit
+   beside the name and leave a hole underneath it. */
+.ident {
+  display: grid;
+  grid-template-columns: 1fr 0.7fr 1.8fr 0.85fr;
+  border-top: 1px solid var(--rule);
+  border-bottom: 2px solid var(--accent);
+}
+.ident > div {
+  padding: 15px 22px 19px;
+  border-left: 1px solid var(--line);
+}
+.ident > div:first-child { border-left: 0; padding-left: 0; }
+.ident .label { display: block; margin-bottom: 9px; }
+.ident-val {
+  font-size: 14.5px;
+  line-height: 1.5;
   color: var(--fg);
 }
-.terminal-header {
-  font-size: 11px;
-  color: var(--fg-dim);
-  letter-spacing: 0.1em;
+.ident-focus { color: var(--fg-dim); }
+.ident-links {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: rgba(88, 196, 212, 0.05);
-  border-bottom: 1px solid var(--line);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
 }
-.terminal-header .path { color: var(--fg-dim); }
-#termOut {
-  padding: 18px 22px 22px;
-}
-.terminal-prompt {
-  color: var(--accent);
-  margin-right: 8px;
-}
-.terminal-line {
+.arrow-link {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
   color: var(--fg);
-  min-height: 1.7em;
-  /* Hanging indent so wrapped output lines align under the text, not the prompt */
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 1px;
+  transition: color 0.18s, border-color 0.18s;
+}
+.arrow-link::after { content: " \2197"; color: var(--fg-faint); }
+.arrow-link:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.arrow-link:hover::after { color: var(--accent); }
+
+/* ===== LISTING (the typewriter, set as text — no panel) =====
+   A filled box became the heaviest thing on the page and read as a slab.
+   A rule and a hanging indent carry it instead. */
+
+.listing {
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.8;
+  max-width: 78ch;
+}
+/* Not uppercased: it carries a path, and ~/ABOUT reads badly. */
+.listing-cap {
+  display: block;
+  margin-bottom: 10px;
+  letter-spacing: 0.14em;
+  text-transform: none;
+}
+.terminal-prompt { color: var(--accent); margin-right: 8px; }
+.terminal-line {
+  color: var(--fg-dim);
+  min-height: 1.8em;
+  /* Hanging indent so wrapped output aligns under the text, not the prompt */
   padding-left: 1.55em;
   text-indent: -1.55em;
 }
 .terminal-cursor {
   display: inline-block;
-  width: 7px;
-  height: 15px;
+  width: 2px; height: 1.05em;
   background: var(--accent);
-  margin-left: 4px;
+  margin-left: 3px;
   vertical-align: text-bottom;
   animation: blink 1.1s steps(1) infinite;
 }
-@keyframes blink {
-  50% { opacity: 0; }
-}
+@keyframes blink { 50% { opacity: 0; } }
 
-.hero-links {
-  margin-top: 26px;
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.pill-link {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  color: var(--fg);
-  text-decoration: none;
-  padding: 10px 16px;
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  background: rgba(17, 20, 26, 0.5);
-  transition: border-color 0.2s, color 0.2s, background 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.pill-link::after {
-  content: "↗";
-  color: var(--fg-faint);
-  transition: color 0.2s;
-}
-.pill-link:hover {
-  border-color: var(--accent-soft);
-  background: var(--accent-wash);
-  color: var(--accent);
-}
-.pill-link:hover::after { color: var(--accent); }
+/* ===== SECTIONS =====
+   Running head in the left margin, content to the right of one vertical rule
+   that runs the length of the page. */
 
-/* ===== SECTIONS ===== */
 .section {
-  margin-bottom: 88px;
-  scroll-margin-top: 90px;
+  display: grid;
+  grid-template-columns: var(--head) 1fr;
+  border-top: 1px solid var(--rule);
+  padding-top: 22px;
+  margin-top: 64px;
+  scroll-margin-top: 66px;
 }
 .section-head {
+  position: sticky;
+  top: 66px;
+  align-self: start;
+  padding: 0 28px 28px 0;
   display: flex;
-  align-items: baseline;
-  gap: 14px;
-  margin-bottom: 32px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid var(--line);
-  position: relative;
-}
-.section-head::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  width: 64px;
-  height: 1px;
-  background: var(--accent);
+  flex-direction: column;
+  gap: 7px;
 }
 .section-num {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
   color: var(--accent);
-  letter-spacing: 0.12em;
 }
 .section-title {
+  font-size: 17px;
   font-weight: 600;
-  font-size: 23px;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
 }
-
-/* ===== LIST ROWS (writing + games) ===== */
-.row-list {
-  list-style: none;
-  display: grid;
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  overflow: hidden;
+.section-body {
+  border-left: 1px solid var(--line);
+  padding: 0 0 28px 28px;
+  min-width: 0;
 }
-.row-item {
-  background: var(--bg);
-  padding: 17px 20px;
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 22px;
-  align-items: center;
-  text-decoration: none;
-  color: var(--fg);
-  transition: background 0.2s;
-  position: relative;
-}
-.row-item::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--accent);
-  transform: scaleY(0);
-  transition: transform 0.2s;
-}
-.row-item:hover { background: var(--accent-wash); }
-.row-item:hover::before { transform: scaleY(1); }
-.row-title {
-  font-weight: 500;
-  font-size: 16px;
-}
-.row-tag {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: var(--fg-faint);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.row-source {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: var(--fg-dim);
-}
-.row-date {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: var(--fg-faint);
-  letter-spacing: 0.08em;
-}
-
 .section-intro {
   font-size: 14.5px;
   color: var(--fg-dim);
-  margin: -16px 0 22px;
+  margin-bottom: 20px;
+  max-width: 60ch;
 }
 .section-intro a {
   color: var(--accent);
@@ -366,174 +274,217 @@ button:focus-visible {
 }
 .section-intro a:hover { border-bottom-color: var(--accent); }
 
-/* ===== PROJECTS GRID ===== */
-.projects-grid {
+/* ===== TABLES ===== */
+
+.dossier { width: 100%; border-collapse: collapse; }
+
+/* Every <tr> is its own grid container, so a content-sized track would resolve
+   to a different width on each row and the columns would stop lining up. Each
+   track is therefore minmax(0, Nfr) — width comes from the row, not the text. */
+.dossier tr {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 22px;
-}
-.project-card {
-  background: var(--card-bg);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition: border-color 0.25s, transform 0.25s;
-  contain: layout style paint;
-}
-.project-card:hover {
-  border-color: var(--accent-soft);
-  transform: translateY(-2px);
-}
-.project-img-wrap {
+  gap: 18px;
+  align-items: baseline;
   position: relative;
-  aspect-ratio: 4 / 3;
+}
+.dossier thead tr {
   background: var(--bg-2);
-  overflow: hidden;
   border-bottom: 1px solid var(--line);
 }
-.project-img-wrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top;
-  /* Settles the light screenshots against the dark cards; full brightness on hover. */
-  filter: saturate(0.9) brightness(0.85);
-  transition: filter 0.25s;
-}
-.project-card:hover .project-img-wrap img {
-  filter: saturate(1) brightness(1);
-}
-.project-body {
-  padding: 22px 22px 20px;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-.project-stack {
-  display: flex;
-  gap: 7px;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-}
-.stack-tag {
-  font-family: 'JetBrains Mono', monospace;
+.dossier th {
+  text-align: left;
+  padding: 8px 0;
+  font-family: var(--mono);
   font-size: 10.5px;
-  letter-spacing: 0.06em;
-  color: var(--fg-dim);
-  padding: 3px 8px;
-  border: 1px solid var(--line);
-  border-radius: 3px;
-}
-.project-title {
-  font-weight: 600;
-  font-size: 19px;
-  margin-bottom: 10px;
-  letter-spacing: -0.01em;
-}
-.project-desc {
-  font-size: 14.5px;
-  color: var(--fg-dim);
-  line-height: 1.6;
-  margin-bottom: 14px;
-}
-.project-why {
-  font-size: 13.5px;
-  color: var(--fg-faint);
-  line-height: 1.6;
-  margin-bottom: 18px;
-  padding-left: 12px;
-  border-left: 1px solid var(--line);
-}
-.project-why .label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: var(--fg-faint);
-  letter-spacing: 0.08em;
+  font-weight: 500;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  display: block;
-  margin-bottom: 2px;
+  color: var(--fg-faint);
 }
-.project-links {
+.dossier tbody tr {
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  transition: background 0.16s;
+}
+.dossier tbody tr:hover { background: var(--row-hover); }
+.dossier tbody tr::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--accent);
+  transform: scaleY(0);
+  transition: transform 0.16s;
+}
+.dossier tbody tr:hover::before { transform: scaleY(1); }
+.dossier td { padding: 13px 0; }
+.dossier th:first-child,
+.dossier td:first-child { padding-left: 12px; }
+
+.dossier--work tr {
+  grid-template-columns:
+    2.6rem minmax(0, 1.55fr) minmax(0, 0.85fr) minmax(0, 2.5fr) minmax(0, 1.75fr);
+}
+.dossier--writing tr {
+  grid-template-columns: 2.6rem minmax(0, 3fr) minmax(0, 1.1fr) minmax(0, 1fr);
+}
+.dossier--games tr {
+  grid-template-columns: 2.6rem minmax(0, 2.6fr) minmax(0, 1fr) minmax(0, 1.1fr);
+}
+
+.c-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+.c-name {
+  font-size: 15.5px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  line-height: 1.35;
+}
+.c-name a {
+  color: var(--fg);
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent-soft);
+  transition: color 0.18s, border-color 0.18s;
+}
+.c-name a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.c-stack {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--fg-dim);
+}
+.c-desc {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--fg-dim);
+}
+.c-meta {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--fg-faint);
+}
+.c-links {
   display: flex;
-  gap: 16px;
   flex-wrap: wrap;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
-  margin-top: auto;
+  gap: 3px 13px;
+  font-family: var(--mono);
+  font-size: 11px;
 }
-.project-links a {
+.c-links a {
   color: var(--accent);
   text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  transition: color 0.2s;
+  transition: color 0.18s;
 }
-.project-links a:hover { color: var(--fg); }
+.c-links a:hover { color: var(--fg); }
+.c-links .none { color: var(--fg-faint); }
 
 /* ===== FOOTER ===== */
+
 .footer {
-  margin-top: 72px;
-  padding-top: 28px;
-  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: var(--head) 1fr;
+  border-top: 2px solid var(--accent);
+  margin-top: 64px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+}
+.footer-id { padding: 18px 28px 40px 0; }
+.footer-meta {
+  border-left: 1px solid var(--line);
+  padding: 18px 0 40px 28px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 20px;
+  gap: 14px 28px;
   flex-wrap: wrap;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11.5px;
-  color: var(--fg-faint);
-  letter-spacing: 0.06em;
 }
 .footer a {
   color: var(--fg-dim);
   text-decoration: none;
+  transition: color 0.18s;
 }
 .footer a:hover { color: var(--accent); }
-.footer-links {
-  display: flex;
-  gap: 18px;
-}
+.footer-links { display: flex; gap: 18px; }
 
 /* ===== RESPONSIVE ===== */
-@media (max-width: 860px) {
-  .projects-grid { grid-template-columns: 1fr; }
-  .topbar { padding: 12px 18px; }
-  .nav { gap: 18px; font-size: 11px; }
-  .page { padding: 96px 18px 40px; }
-  .row-item { grid-template-columns: 1fr; gap: 5px; }
-}
-@media (max-width: 560px) {
-  .nav .hide-sm, .nav .nav-sep { display: none; }
-  .hero { padding-top: 20px; margin-bottom: 72px; }
-  .hero-terminal { font-size: 12.5px; }
-  #termOut { padding: 16px 16px 18px; }
+
+@media (max-width: 1000px) {
+  :root { --head: 156px; }
+  .ident > div { padding: 14px 16px 18px; }
 }
 
-/* Reduced motion */
+@media (max-width: 860px) {
+  :root { --pad: 22px; }
+  .masthead { padding-top: 40px; }
+  .masthead-name { margin-bottom: 28px; }
+
+  .ident { grid-template-columns: repeat(2, 1fr); }
+  .ident > div { border-top: 1px solid var(--line); }
+  .ident > div:nth-child(-n + 2) { border-top: 0; }
+  .ident > div:nth-child(odd) { border-left: 0; padding-left: 0; }
+
+  /* Running heads move above their content; the vertical rule goes with them. */
+  .section, .footer { grid-template-columns: 1fr; }
+  .section { margin-top: 48px; }
+  .section-head {
+    position: static;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 12px;
+    padding: 0 0 16px;
+  }
+  .section-body, .footer-meta { border-left: 0; padding-left: 0; }
+  .footer-id { padding-bottom: 10px; }
+  .footer-meta { padding-bottom: 36px; }
+}
+
+@media (max-width: 700px) {
+  .dossier thead {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+  .dossier tbody tr {
+    grid-template-columns: 2.2rem 1fr;
+    gap: 4px 12px;
+    padding: 14px 0;
+  }
+  .dossier tbody td { grid-column: 2; padding: 0; }
+  .dossier tbody td:first-child { grid-column: 1; grid-row: 1; padding-left: 8px; }
+}
+
+@media (max-width: 560px) {
+  .ident { grid-template-columns: 1fr; }
+  .ident > div {
+    border-left: 0;
+    padding-left: 0;
+    border-top: 1px solid var(--line);
+  }
+  .ident > div:first-child { border-top: 0; }
+  .nav { gap: 15px; letter-spacing: 0.1em; }
+  .nav .hide-sm, .nav .nav-sep { display: none; }
+  .listing { font-size: 12px; }
+}
+
+/* ===== REDUCED MOTION ===== */
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .bg-grid::before,
-  .terminal-cursor {
-    animation: none !important;
-  }
-  .project-card,
-  .project-img-wrap img,
-  .row-item,
-  .row-item::before,
-  .pill-link {
+  .terminal-cursor { animation: none !important; opacity: 1; }
+  .dossier tbody tr,
+  .dossier tbody tr::before,
+  .c-name a, .arrow-link, .nav a, .footer a, .c-links a {
     transition: none !important;
   }
-  .terminal-cursor { opacity: 1; }
 }
 
-/* Selection */
-::selection {
-  background: var(--accent);
-  color: var(--bg);
-}
+::selection { background: var(--accent); color: var(--bg); }

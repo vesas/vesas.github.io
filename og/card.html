@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>og card source — 1200x630</title>
+<!--
+  Source for img/og.png. Not linked from the site; it exists so the social card
+  can be regenerated instead of being a one-off screenshot nobody can reproduce.
+  Regenerate from the repo root with a local server running:
+
+  chrome --headless=new --window-size=1200,630 \
+         --screenshot=img/og.png http://localhost:8000/og/card.html
+
+  It mirrors the masthead in index.html — name over a ruled identification
+  strip. Colours and type come straight from styles.css; keep them in step.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:       #FAF9F6;
+    --fg:       #15171A;
+    --fg-dim:   #4E5258;
+    --fg-faint: #6A6E75;
+    --accent:   #0E5E66;
+    --line:     rgba(21, 23, 26, 0.16);
+    --sans: "Inter Tight", system-ui, sans-serif;
+    --mono: "JetBrains Mono", monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--sans);
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .card {
+    height: 100%;
+    padding: 76px 72px 60px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .name {
+    font-size: 104px;
+    font-weight: 700;
+    line-height: 0.94;
+    letter-spacing: -0.035em;
+    margin-bottom: 44px;
+  }
+
+  .label {
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--fg-faint);
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  /* The identification strip, same idea as the site masthead. */
+  .ident {
+    display: grid;
+    grid-template-columns: 1fr 0.7fr 1.9fr;
+    border-top: 1px solid var(--fg);
+    border-bottom: 3px solid var(--accent);
+  }
+  .ident > div {
+    padding: 20px 28px 26px;
+    border-left: 1px solid var(--line);
+  }
+  .ident > div:first-child { border-left: 0; padding-left: 0; }
+  .ident-val {
+    font-size: 22px;
+    line-height: 1.4;
+    color: var(--fg);
+  }
+  .ident-focus { font-size: 20px; color: var(--fg-dim); }
+
+  .foot {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: var(--mono);
+    font-size: 17px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fg-faint);
+  }
+  .foot .domain { color: var(--fg); font-weight: 500; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="name">Vesa Saarinen</div>
+
+    <div class="ident">
+      <div>
+        <span class="label">Role</span>
+        <p class="ident-val">Solution Architect</p>
+      </div>
+      <div>
+        <span class="label">Based</span>
+        <p class="ident-val">Finland</p>
+      </div>
+      <div>
+        <span class="label">Focus</span>
+        <p class="ident-val ident-focus">Legacy modernization &middot; Performance engineering &middot; LLM integration</p>
+      </div>
+    </div>
+
+    <div class="foot">
+      <span class="domain">vesas.fi</span>
+      <span>Java &middot; Python &middot; TypeScript</span>
+    </div>
+  </div>
+</body>
+</html>
