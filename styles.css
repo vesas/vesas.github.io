@@ -329,7 +329,8 @@ button:focus-visible {
   grid-template-columns: 2.6rem minmax(0, 3fr) minmax(0, 1.1fr) minmax(0, 1fr);
 }
 .dossier--games tr {
-  grid-template-columns: 2.6rem minmax(0, 2.6fr) minmax(0, 1fr) minmax(0, 1.1fr);
+  grid-template-columns:
+    2.6rem minmax(0, 1.9fr) minmax(0, 0.7fr) minmax(0, 2.2fr) minmax(0, 1.1fr);
 }
 
 .c-num {
