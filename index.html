@@ -5,20 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Vesa Saarinen — Solution Architect | Java, Python, AI/LLM | Finland</title>
 <meta name="description" content="Vesa Saarinen — Solution Architect in Finland. Specializing in legacy modernization, AI-assisted engineering, LLM integration, and high-performance Java/Python/TypeScript systems. Experienced in Finnish finance and insurance." />
+<meta name="theme-color" content="#0b0d11" />
 <link rel="canonical" href="https://vesas.fi/" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://vesas.fi/" />
+<meta property="og:site_name" content="vesas.fi" />
 <meta property="og:title" content="Vesa Saarinen — Solution Architect | Finland" />
 <meta property="og:description" content="Solution Architect specializing in legacy modernization, AI-assisted engineering, LLM integration, and high-performance Java/Python/TypeScript systems." />
 <meta property="og:locale" content="en_US" />
+<meta property="og:image" content="https://vesas.fi/img/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Vesa Saarinen — Solution Architect, Finland" />
 
 <!-- Twitter Card -->
-<meta name="twitter:card" content="summary" />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Vesa Saarinen — Solution Architect | Finland" />
 <meta name="twitter:description" content="Solution Architect specializing in legacy modernization, AI-assisted engineering, LLM integration, and high-performance Java/Python/TypeScript systems." />
+<meta name="twitter:image" content="https://vesas.fi/img/og.png" />
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -39,61 +46,46 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
-<link rel="stylesheet" href="styles.css?v=3.3" />
+<link rel="stylesheet" href="styles.css?v=4.1" />
 </head>
 <body>
 
 <div class="bg-grid"></div>
 <div class="bg-glow"></div>
 
-<!-- HUD TARGETING RETICLE -->
-<div class="reticle" id="reticle">
-  <span class="ret-corner ret-tl"></span>
-  <span class="ret-corner ret-tr"></span>
-  <span class="ret-corner ret-bl"></span>
-  <span class="ret-corner ret-br"></span>
-  <span class="ret-cross"></span>
-  <span class="ret-dot"></span>
-  <span class="ret-scan"></span>
-  <span class="ret-label" id="retLabel">LOCK</span>
-</div>
-
-<!-- TOP STATUS BAR -->
+<!-- TOP BAR -->
 <header class="topbar">
-  <div class="topbar-left">
-    <span><span class="dot"></span>VESAS.FI</span>
-    <span class="hide-sm" aria-hidden="true">NODE/<span class="accent">HEL-01</span></span>
-    <span class="hide-sm" aria-hidden="true">SEC/<span class="magenta">OPEN</span></span>
-  </div>
-  <div class="topbar-right">
-    <span class="hide-sm" aria-hidden="true">LAT 60.17°N · LON 24.94°E</span>
-    <span id="clock">--:--:--</span>
-  </div>
+  <a class="brand" href="#top">vesas.fi</a>
+  <nav class="nav" aria-label="Main">
+    <a href="#projects">Projects</a>
+    <a href="#writing">Writing</a>
+    <a href="#games">Games</a>
+    <span class="nav-sep" aria-hidden="true"></span>
+    <a class="hide-sm" href="https://github.com/vesas" target="_blank" rel="me noopener">GitHub</a>
+    <a class="hide-sm" href="https://www.linkedin.com/in/vesamsaarinen/" target="_blank" rel="me noopener">LinkedIn</a>
+  </nav>
 </header>
 
-<main class="page">
+<main class="page" id="top">
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-tag" aria-hidden="true">PERSONNEL_FILE · 0x771F</div>
-    <h1 class="hero-name">
-      <span class="glitch" data-text="VESA">VESA</span>
-      <span class="glitch" data-text="SAARINEN">SAARINEN</span>
-    </h1>
-    <p class="hero-role">solution architect <span class="accent">[ Finland ]</span></p>
+    <h1 class="hero-name">Vesa Saarinen</h1>
+    <p class="hero-role">Solution Architect <span class="accent">· Finland</span></p>
 
+    <!-- The bio proper. The terminal below types out the same words for anyone
+         who can see it, and is hidden from assistive tech so it isn't read twice. -->
     <div class="sr-only">
       <p>Hi, I'm Vesa, a solution architect from Finland.</p>
       <p>For many years I've worked across Finnish finance and insurance, on internet banking, system integrations, and various enterprise systems.</p>
       <p>Current focus: legacy modernization, performance, AI-assisted engineering, and integrating LLMs into existing systems.</p>
     </div>
 
-    <div class="hero-terminal">
+    <div class="hero-terminal" aria-hidden="true">
       <div class="terminal-header">
-        <span class="path">~/cortex/vesa.shard</span>
-        <span class="status">READ-ONLY</span>
+        <span class="path">~/about</span>
       </div>
       <div id="termOut"></div>
     </div>
@@ -104,188 +96,164 @@
     </div>
   </section>
 
-  <!-- DATASTREAM divider -->
-  <div class="datastream" aria-hidden="true">
-    <div class="datastream-label datastream-label--left">0x7D46 · DATASTREAM</div>
-    <div class="datastream-label datastream-label--right">TX/RX · STABLE</div>
-    <div class="datastream-line"></div>
-    <div class="datastream-track"><span class="datastream-flow"></span></div>
-  </div>
-
   <!-- PROJECTS -->
-  <section class="section">
+  <section class="section" id="projects">
     <div class="section-head">
-      <span class="section-num">/01</span>
+      <span class="section-num" aria-hidden="true">01</span>
       <h2 class="section-title">Projects</h2>
-      <span class="section-meta" aria-hidden="true">09 INDEXED</span>
     </div>
 
     <div class="projects-grid" id="projectsGrid"></div>
   </section>
 
-  <!-- GAMES -->
-  <section class="section">
+  <!-- WRITING -->
+  <section class="section" id="writing">
     <div class="section-head">
-      <span class="section-num">/02</span>
-      <h2 class="section-title">Games</h2>
-      <span class="section-meta" aria-hidden="true">02 PROTOS</span>
+      <span class="section-num" aria-hidden="true">02</span>
+      <h2 class="section-title">Writing</h2>
     </div>
-    <p class="section-intro">Small game prototypes, published on <a href="https://vesas.itch.io/" target="_blank" rel="me noopener">itch.io</a>.</p>
-    <ul class="games-list">
+    <ul class="row-list">
       <li>
-        <a class="game-item" href="https://vesas.itch.io/seasons-of-the-grove" target="_blank" rel="noopener">
-          <span class="game-title">Seasons of the Grove</span>
-          <span class="game-tag">PUZZLE</span>
-          <span class="game-source">itch.io ↗</span>
-        </a>
-      </li>
-      <li>
-        <a class="game-item" href="https://vesas.itch.io/shadow-cabinet-of-familiars" target="_blank" rel="noopener">
-          <span class="game-title">Shadow Cabinet of Familiars</span>
-          <span class="game-tag">BROWSER</span>
-          <span class="game-source">itch.io ↗</span>
+        <a class="row-item" href="https://reflector.fi/datan-hyotykayton-uusi-anatomia/" target="_blank" rel="noopener">
+          <span class="row-title" lang="fi">Datan hyötykäytön uusi anatomia</span>
+          <span class="row-source">reflector.fi ↗</span>
+          <span class="row-date">Mar 2026</span>
         </a>
       </li>
     </ul>
   </section>
 
-  <!-- WRITING -->
-  <section class="section">
+  <!-- GAMES -->
+  <section class="section" id="games">
     <div class="section-head">
-      <span class="section-num">/03</span>
-      <h2 class="section-title">Writing</h2>
-      <span class="section-meta" aria-hidden="true">01 ENTRY</span>
+      <span class="section-num" aria-hidden="true">03</span>
+      <h2 class="section-title">Games</h2>
     </div>
-    <ul class="writing-list">
+    <p class="section-intro">Small game prototypes, published on <a href="https://vesas.itch.io/" target="_blank" rel="me noopener">itch.io</a>.</p>
+    <ul class="row-list">
       <li>
-        <a class="writing-item" href="https://reflector.fi/datan-hyotykayton-uusi-anatomia/" target="_blank" rel="noopener">
-          <span class="writing-title">Datan hyötykäytön uusi anatomia</span>
-          <span class="writing-source">reflector.fi</span>
-          <span class="writing-date">MAR 2026</span>
+        <a class="row-item" href="https://vesas.itch.io/seasons-of-the-grove" target="_blank" rel="noopener">
+          <span class="row-title">Seasons of the Grove</span>
+          <span class="row-tag">Puzzle</span>
+          <span class="row-source">itch.io ↗</span>
+        </a>
+      </li>
+      <li>
+        <a class="row-item" href="https://vesas.itch.io/shadow-cabinet-of-familiars" target="_blank" rel="noopener">
+          <span class="row-title">Shadow Cabinet of Familiars</span>
+          <span class="row-tag">Browser</span>
+          <span class="row-source">itch.io ↗</span>
         </a>
       </li>
     </ul>
   </section>
 
   <footer class="footer">
-    <div>© 2026 V.SAARINEN · <span class="accent">PUBLIC NODE</span></div>
-    <div aria-hidden="true">BUILD <span class="accent">v3.0.26</span> · UPLINK <span class="accent">STABLE</span></div>
+    <div>© 2026 Vesa Saarinen</div>
+    <div class="footer-links">
+      <a href="https://github.com/vesas" target="_blank" rel="me noopener">GitHub</a>
+      <a href="https://www.linkedin.com/in/vesamsaarinen/" target="_blank" rel="me noopener">LinkedIn</a>
+    </div>
   </footer>
 </main>
-
-<!-- BOTTOM TICKER -->
-<div class="ticker" aria-hidden="true">
-  <div class="ticker-track" id="tickerTrack"></div>
-</div>
-
-<!-- SCANLINES + VIGNETTE (above content) -->
-<div class="bg-scanlines"></div>
-<div class="bg-vignette"></div>
 
 <script type="application/json" id="projects-data">
 [
   {
-    "id": "0x01",
-    "title": "JDBC profiler",
-    "img": "https://vesas.fi/img/jdbclens_ss.png",
+    "title": "JDBC Lens",
+    "img": "img/jdbclens_ss.png",
     "stack": ["Java"],
-    "desc": "Records JDBC calls and produces a report of the most expensive queries, including query text, execution time, and call stack. Useful for identifying bottlenecks in Java applications.",
-    "why": "Make performance work easier. Identify and analyze performance bottlenecks in Java applications.",
+    "desc": "A JDBC profiler that records every database call and reports the slowest queries with their SQL, timing, and originating call stack.",
+    "why": "Make performance work easier by tying each slow query back to the code that issued it.",
     "links": [
-      { "label": "Maven", "href": "https://central.sonatype.com/artifact/fi.vesas.jdbclens/jdbc-lens-core", "text": "Central" },
-      { "label": "Repo", "href": "https://github.com/vesas/jdbc-lens", "text": "github" },
-      { "label": "Sample", "href": "https://vesas.fi/jdbclens/report.html", "text": "report" }
+      { "href": "https://central.sonatype.com/artifact/fi.vesas.jdbclens/jdbc-lens-core", "text": "Maven Central" },
+      { "href": "https://github.com/vesas/jdbc-lens", "text": "GitHub" },
+      { "href": "https://vesas.fi/jdbclens/report.html", "text": "Sample report" }
     ]
   },
   {
-    "id": "0x02",
-    "title": "Cobol → Java modernizer",
-    "img": "https://vesas.fi/img/cobol_ss.png",
+    "title": "COBOL → Java modernizer",
+    "img": "img/cobol_ss.png",
     "stack": ["Java", "LLM"],
-    "desc": "Converts legacy Cobol programs into modern Java. A grammar-driven parser and multi-stage deterministic AST pipeline produce runtime-correct Java. LLM stages then modernize and optimize the output.",
-    "why": "Explore transpiler construction, grammar-driven parsing, and bridging legacy business logic to a modern runtime.",
+    "desc": "Converts legacy COBOL programs into modern Java. A grammar-driven parser and a multi-stage, deterministic AST pipeline produce runtime-correct Java; LLM stages then modernize and tidy the result.",
+    "why": "Explore transpiler construction, and what it takes to move decades-old business logic onto a modern runtime.",
     "links": [
-      { "label": "Demo", "href": "https://vesas.fi/cobol/modernizer.html", "text": "cobol→java" }
+      { "href": "https://vesas.fi/cobol/modernizer.html", "text": "Live demo" }
     ]
   },
   {
-    "id": "0x03",
     "title": "arch-audit",
-    "img": "https://vesas.fi/img/archaudit_ss.png",
+    "img": "img/archaudit_ss.png",
     "stack": ["Python"],
-    "desc": "An architecture auditing tool that speeds up getting oriented in an unknown codebase. Combines static analysis, dependency scanning, code metrics, and structure extraction into an interactive terminal-based findings browser.",
-    "why": "Programmatic software analysis.",
+    "desc": "An architecture auditing tool for getting oriented in an unfamiliar codebase. Combines static analysis, dependency scanning, code metrics, and structure extraction into an interactive terminal browser for the findings.",
+    "why": "Answer the first questions about a codebase — what is in here, what depends on what — without reading all of it first.",
     "links": []
   },
   {
-    "id": "0x04",
     "title": "Omastoppi.fi",
-    "img": "https://vesas.fi/img/omastop_ss.png",
+    "img": "img/omastop_ss.png",
     "stack": ["React", "Next.js"],
-    "desc": "Web/mobile application for quickly viewing departure times for nearby public transport stops. Data fetched realtime from the HSL GraphQL API.",
-    "why": "Learn React/Next.js, and create an application which can be used quickly when on the go on the HSL region.",
+    "desc": "Web and mobile app for checking departure times at nearby public transport stops. Real-time data from the GraphQL API of HSL, the Helsinki regional transport authority.",
+    "why": "Learn React and Next.js, and end up with something quick enough to use while walking to the stop.",
     "links": [
-      { "label": "Live", "href": "https://www.omastoppi.fi/", "text": "omastoppi.fi" },
-      { "label": "Repo", "href": "https://github.com/vesas/nextjs-omastoppi", "text": "github" }
+      { "href": "https://www.omastoppi.fi/", "text": "omastoppi.fi" },
+      { "href": "https://github.com/vesas/nextjs-omastoppi", "text": "GitHub" }
     ]
   },
   {
-    "id": "0x05",
     "title": "Econstats.eu",
-    "img": "https://vesas.fi/img/econstats_ss.png",
+    "img": "img/econstats_ss.png",
     "stack": ["Python", "AWS"],
-    "desc": "Charts the major macroeconomic indicators with an EU focus. Data fetched daily from the BLS, FRED, and ECB APIs.",
-    "why": "Learn more about AWS services. Create a macroeconomic dashboard for the EU area.",
+    "desc": "Charts the major macroeconomic indicators with an EU focus. Data is pulled daily from the BLS, FRED, and ECB APIs.",
+    "why": "Learn more about AWS, and have one place to check how the European economy is doing.",
     "links": [
-      { "label": "Live", "href": "https://econstats.eu", "text": "econstats.eu" }
+      { "href": "https://econstats.eu", "text": "econstats.eu" }
     ]
   },
   {
-    "id": "0x06",
     "title": "Neural networks in Java",
-    "img": "https://vesas.fi/img/javann_ss.png",
+    "img": "img/javann_ss.png",
+    "pos": "center",
     "stack": ["Java"],
-    "desc": "Neural networks with automatic differentiation and backpropagation in Java, from scratch.",
-    "why": "Learn about machine learning, gradient descent, neural networks.",
+    "desc": "Automatic differentiation and backpropagation, implemented from scratch with no libraries.",
+    "why": "Understand what happens inside a training loop by building every part of it.",
     "links": [
-      { "label": "Repo", "href": "https://github.com/vesas/java-nn", "text": "github" }
+      { "href": "https://github.com/vesas/java-nn", "text": "GitHub" }
     ]
   },
   {
-    "id": "0x07",
-    "title": "WFC generator",
-    "img": "https://vesas.fi/img/wfc_ss.png",
+    "title": "Wave Function Collapse generator",
+    "img": "img/wfc_ss.png",
     "stack": ["Java"],
-    "desc": "Wave Function Collapse is used in game dev for generating output based on a set of tiles and rules. Here, generating textures. A simple Java implementation where the rules are defined in code.",
-    "why": "Complex result from simple rules.",
+    "desc": "Wave Function Collapse generates output from a set of tiles and adjacency rules, most often used for game levels. This is a small Java implementation applied to textures, with the rules defined in code.",
+    "why": "See how much structure a handful of local rules can produce.",
     "links": [
-      { "label": "Repo", "href": "https://github.com/vesas/simple-wfc", "text": "github" }
+      { "href": "https://github.com/vesas/simple-wfc", "text": "GitHub" }
     ]
   },
   {
-    "id": "0x08",
     "title": "Spacefly",
-    "img": "https://vesas.fi/img/spacefly_ss.png",
+    "img": "img/spacefly_ss.png",
     "stack": ["Java"],
-    "desc": "2D game with procedural level generation and dynamic area of sight calculation.",
-    "why": "Procedural generation and visibility systems.",
+    "desc": "2D game with procedurally generated levels and a dynamic field-of-view calculation.",
+    "why": "Get procedural generation and real-time visibility working together in a game loop.",
     "links": [
-      { "label": "Repo", "href": "https://github.com/vesas/spacefly", "text": "github" }
+      { "href": "https://github.com/vesas/spacefly", "text": "GitHub" }
     ]
   },
   {
-    "id": "0x09",
     "title": "Javarays",
-    "img": "https://vesas.fi/img/javarays_ss.png",
+    "img": "img/javarays_ss.png",
+    "pos": "center",
     "stack": ["Java"],
-    "desc": "Vectorized path tracer in Java.",
-    "why": "Explore performance ideas. Try out the (new) Java Vectorization API.",
+    "desc": "A path tracer in Java, vectorized with the JDK Vector API.",
+    "why": "Push Java performance, and see what the Vector API can do on real numerical work.",
     "links": []
   }
 ]
 </script>
 
-<script src="script.js?v=3.3" defer></script>
+<script src="script.js?v=4.1" defer></script>
 
 </body>
 </html>

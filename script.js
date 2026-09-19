@@ -1,501 +1,161 @@
-// ============ HUD TARGETING RETICLE ============
-  (function () {
-    const reticle = document.getElementById('reticle');
-    const label = document.getElementById('retLabel');
-    if (!reticle) return;
+// ============ TERMINAL BIO ============
+// Types the bio out quickly (whole sequence lands in well under a second).
+// The same text is present in a .sr-only block in the markup for assistive tech
+// and for anyone arriving without JS.
+(function () {
+  const out = document.getElementById('termOut');
+  if (!out) return;
 
-    // Lockable target selectors + how to derive their label
-    const TARGETS = [
-      { sel: '.project-card', label: (el) => {
-        const id = el.querySelector('.project-id');
-        return 'LOCK · ' + (id ? id.textContent.trim() : 'PROJECT');
-      }},
-      { sel: '.writing-item', label: () => 'LOCK · ARTICLE' },
-      { sel: '.game-item', label: () => 'LOCK · GAME' },
-      { sel: '.pill-link', label: (el) => 'LINK · ' + el.textContent.trim().toUpperCase() },
-      { sel: '.hero-name', label: () => 'LOCK · IDENT' },
-      { sel: '.project-links a', label: (el) => 'LINK · ' + el.textContent.replace(/[↗:]/g,'').trim().toUpperCase().slice(0, 18) }
-    ];
+  const lines = [
+    { prompt: '$', text: 'whoami' },
+    { text: 'Hi, I’m Vesa, a solution architect from Finland.' },
+    { text: '' },
+    { prompt: '$', text: 'cat ./bio.txt' },
+    { text: 'For many years I’ve worked across Finnish finance and insurance, on' },
+    { text: 'internet banking, system integrations, and various enterprise systems.' },
+    { text: '' },
+    { text: 'Current focus: legacy modernization, performance, AI-assisted' },
+    { text: 'engineering, and integrating LLMs into existing systems.' },
+    { prompt: '$', text: '', cursor: true }
+  ];
 
-    let cursorX = window.innerWidth / 2;
-    let cursorY = window.innerHeight / 2;
-    let smoothX = cursorX;
-    let smoothY = cursorY;
-    let lockedEl = null;
-    let firstMove = false;
+  // Per-character and per-line costs in ms. Commands type at a readable pace,
+  // output text streams fast so the bio is simply there.
+  const PROMPT_CHAR = 8;
+  const BODY_CHAR = 0.6;
+  const PROMPT_PAUSE = 70;
+  const BODY_PAUSE = 10;
+  const START_DELAY = 60;
 
-    function findTarget(e) {
-      const target = e.target;
-      if (!target || typeof target.closest !== 'function') return null;
-      for (const t of TARGETS) {
-        const el = target.closest(t.sel);
-        if (el) return { el, getLabel: t.label };
-      }
-      return null;
+  const fragment = document.createDocumentFragment();
+  const rowEls = lines.map((ln) => {
+    const row = document.createElement('div');
+    row.className = 'terminal-line';
+    let promptEl = null;
+    if (ln.prompt) {
+      promptEl = document.createElement('span');
+      promptEl.className = 'terminal-prompt';
+      promptEl.textContent = ln.prompt;
+      // Space stays reserved but hidden until this line's turn — a fresh
+      // terminal shouldn't already show a wall of $ signs.
+      promptEl.style.visibility = 'hidden';
+      row.appendChild(promptEl);
+    } else {
+      const indent = document.createElement('span');
+      indent.className = 'terminal-prompt';
+      indent.style.visibility = 'hidden';
+      indent.textContent = '$';
+      row.appendChild(indent);
     }
-
-    function applyLock(found) {
-      const r = found.el.getBoundingClientRect();
-      // Clamp size so giant cards don't get a tiny inset
-      const pad = 8;
-      reticle.classList.add('locked');
-      reticle.style.left = (r.left + r.width / 2) + 'px';
-      reticle.style.top = (r.top + r.height / 2) + 'px';
-      reticle.style.width = (r.width + pad * 2) + 'px';
-      reticle.style.height = (r.height + pad * 2) + 'px';
-      label.textContent = found.getLabel(found.el);
-      lockedEl = found.el;
+    const span = document.createElement('span');
+    row.appendChild(span);
+    // Reserve baseline height on blank lines so the box keeps its shape
+    // before typing reaches them.
+    if (!ln.text && !ln.prompt) {
+      const ghost = document.createElement('span');
+      ghost.textContent = ' ';
+      ghost.style.visibility = 'hidden';
+      row.appendChild(ghost);
     }
+    fragment.appendChild(row);
+    return { row, span, promptEl };
+  });
+  out.appendChild(fragment);
 
-    function releaseLock() {
-      reticle.classList.remove('locked');
-      reticle.style.width = '22px';
-      reticle.style.height = '22px';
-      lockedEl = null;
-    }
+  function addCursor(i) {
+    const c = document.createElement('span');
+    c.className = 'terminal-cursor';
+    rowEls[i].span.appendChild(c);
+  }
 
-    let lastLockCheck = 0;
-    document.addEventListener('mousemove', (e) => {
-      cursorX = e.clientX;
-      cursorY = e.clientY;
-      if (!firstMove) { firstMove = true; reticle.classList.add('visible'); smoothX = cursorX; smoothY = cursorY; }
-
-      const now = performance.now();
-      if (now - lastLockCheck > 100) {
-        lastLockCheck = now;
-        const found = findTarget(e);
-        if (found) {
-          if (found.el !== lockedEl) applyLock(found);
-        } else if (lockedEl) {
-          releaseLock();
-        }
-      }
-      startAnimation();
-    }, { passive: true });
-
-    // Re-measure on scroll/resize while locked so brackets stay glued
-    let relockScheduled = false;
-    function relock() {
-      if (!lockedEl || relockScheduled) return;
-      relockScheduled = true;
-      requestAnimationFrame(() => {
-        relockScheduled = false;
-        if (!lockedEl) return;
-        const r = lockedEl.getBoundingClientRect();
-        const pad = 8;
-        reticle.style.left = (r.left + r.width / 2) + 'px';
-        reticle.style.top = (r.top + r.height / 2) + 'px';
-        reticle.style.width = (r.width + pad * 2) + 'px';
-        reticle.style.height = (r.height + pad * 2) + 'px';
-      });
-    }
-    window.addEventListener('scroll', relock, { passive: true });
-    window.addEventListener('resize', relock);
-
-    document.addEventListener('mouseleave', () => {
-      reticle.classList.remove('visible');
+  function finishAll() {
+    lines.forEach((ln, i) => {
+      if (rowEls[i].promptEl) rowEls[i].promptEl.style.visibility = 'visible';
+      rowEls[i].span.textContent = ln.text;
+      if (ln.cursor) addCursor(i);
     });
-    document.addEventListener('mouseenter', () => {
-      if (firstMove) { reticle.classList.add('visible'); startAnimation(); }
-    });
+  }
 
-    // Smooth-follow when idle (not locked) — demand-driven, self-terminating
-    let animating = false;
-    let lastTime = 0;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    finishAll();
+    return;
+  }
 
-    function tick(now) {
-      if (!lockedEl && firstMove) {
-        const dt = Math.min(now - (lastTime || now), 50);
-        lastTime = now;
-        const factor = 1 - Math.exp(-12 * dt / 1000);
-        smoothX += (cursorX - smoothX) * factor;
-        smoothY += (cursorY - smoothY) * factor;
-        reticle.style.left = smoothX + 'px';
-        reticle.style.top = smoothY + 'px';
+  let lineIdx = 0;
+  let charIdx = 0;
+  let credit = -START_DELAY; // negative credit acts as the opening pause
+  let lastFrame = 0;
 
-        if (Math.abs(cursorX - smoothX) > 0.5 || Math.abs(cursorY - smoothY) > 0.5) {
-          requestAnimationFrame(tick);
-          return;
-        }
-        smoothX = cursorX;
-        smoothY = cursorY;
-        reticle.style.left = smoothX + 'px';
-        reticle.style.top = smoothY + 'px';
-      }
-      animating = false;
-      lastTime = 0;
-    }
+  // If frames are throttled (backgrounded tab, heavy load), don't leave the bio
+  // half-typed — put the whole thing on screen and stop.
+  const bail = setTimeout(() => { lineIdx = lines.length; finishAll(); }, 2500);
 
-    function startAnimation() {
-      if (!animating) {
-        animating = true;
-        requestAnimationFrame(tick);
-      }
-    }
-  })();
+  function frame(now) {
+    credit += Math.min(now - (lastFrame || now), 250);
+    lastFrame = now;
 
-  // ============ DECRYPT EFFECTS (titles) ============
-  (function () {
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const POOL = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
-    const FLASH_CLASSES = ['flash-cyan', 'flash-cyan', 'flash-lime', 'flash-magenta']; // cyan biased
-    const randGlyph = () => POOL[(Math.random() * POOL.length) | 0];
-
-    function setupSpans(el) {
-      const text = el.textContent;
-      el.setAttribute('aria-label', text);
-      el.textContent = '';
-      const chars = [];
-      for (let i = 0; i < text.length; i++) {
-        const span = document.createElement('span');
-        span.className = 'decrypt-char';
-        span.setAttribute('aria-hidden', 'true');
-        const ch = text[i];
-        span.textContent = ch === ' ' ? '\u00A0' : ch;
-        el.appendChild(span);
-        chars.push({ span, final: ch, settled: false, lastSwap: 0, settleAt: 0 });
-      }
-      // Lock each char span to its natural Latin width. Any wider glyph (katakana)
-      // will visually overflow the span without affecting siblings or wrapping.
-      const widths = chars.map((c) => c.span.getBoundingClientRect().width);
-      chars.forEach((c, i) => { c.span.style.width = widths[i] + 'px'; });
-      el._decryptChars = chars;
-      return chars;
-    }
-
-    function initialDecrypt(el) {
-      if (reduced) {
-        const chars = setupSpans(el);
-        chars.forEach((c) => {
-          c.settled = true;
-          c.span.textContent = c.final === ' ' ? '\u00A0' : c.final;
-          c.span.classList.add('settled');
-        });
-        scheduleMiniGlitch(el);
-        return;
-      }
-
-      const chars = setupSpans(el);
-      chars.forEach((c, i) => {
-        c.settleAt = i * 55 + 420 + Math.random() * 360;
-        if (c.final === ' ') {
-          c.settled = true;
-          c.span.classList.add('settled');
-        }
-      });
-
-      const start = performance.now();
-      function frame(now) {
-        const t = now - start;
-        let allDone = true;
-        for (const c of chars) {
-          if (c.settled) continue;
-          if (t >= c.settleAt) {
-            c.span.textContent = c.final;
-            c.span.classList.add('settled');
-            c.settled = true;
-          } else {
-            allDone = false;
-            if (now - c.lastSwap >= 65) {
-              c.span.textContent = randGlyph();
-              c.lastSwap = now;
-            }
-          }
-        }
-        if (allDone) {
-          scheduleMiniGlitch(el);
-        } else {
-          requestAnimationFrame(frame);
-        }
-      }
-      requestAnimationFrame(frame);
-    }
-
-    function miniGlitch(el) {
-      const chars = el._decryptChars;
-      if (!chars) return;
-
-      const candidates = chars.filter((c) => c.final !== ' ' && !c._glitching);
-      if (!candidates.length) return;
-
-      const count = 1 + ((Math.random() * Math.min(3, candidates.length)) | 0);
-      const picks = [];
-      while (picks.length < count) {
-        const c = candidates[(Math.random() * candidates.length) | 0];
-        if (!picks.includes(c)) picks.push(c);
-      }
-
-      const flashClass = FLASH_CLASSES[(Math.random() * FLASH_CLASSES.length) | 0];
-
-      picks.forEach((c) => {
-        c._glitching = true;
-        c.span.classList.add(flashClass);
-        const duration = 220 + Math.random() * 240;
-        const start = performance.now();
-        let last = 0;
-        function tick(now) {
-          const t = now - start;
-          if (t >= duration) {
-            c.span.textContent = c.final;
-            c.span.classList.remove(flashClass);
-            c._glitching = false;
-            return;
-          }
-          if (now - last >= 55) {
-            c.span.textContent = randGlyph();
-            last = now;
-          }
-          requestAnimationFrame(tick);
-        }
-        requestAnimationFrame(tick);
-      });
-    }
-
-    function scheduleMiniGlitch(el) {
-      if (reduced) return;
-      const delay = 8000 + Math.random() * 14000; // 8–22s per element
-      setTimeout(() => {
-        if (document.hidden) {
-          const resume = () => {
-            document.removeEventListener('visibilitychange', resume);
-            scheduleMiniGlitch(el);
-          };
-          document.addEventListener('visibilitychange', resume);
-          return;
-        }
-        const rect = el.getBoundingClientRect();
-        const visible = rect.bottom > 0 && rect.top < window.innerHeight;
-        if (visible) miniGlitch(el);
-        scheduleMiniGlitch(el);
-      }, delay);
-    }
-
-    function observeAll() {
-      const titles = document.querySelectorAll('.section-title, .project-title');
-      if (!titles.length) return;
-      if ('IntersectionObserver' in window) {
-        const obs = new IntersectionObserver((entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting && !entry.target.dataset.decrypted) {
-              entry.target.dataset.decrypted = '1';
-              initialDecrypt(entry.target);
-              obs.unobserve(entry.target);
-            }
-          }
-        }, { threshold: 0.6, rootMargin: '0px 0px -10% 0px' });
-        titles.forEach((t) => {
-          if (!t.dataset.decrypted) obs.observe(t);
-        });
-      } else {
-        titles.forEach((t) => {
-          if (!t.dataset.decrypted) {
-            t.dataset.decrypted = '1';
-            initialDecrypt(t);
-          }
-        });
-      }
-    }
-
-    // Exposed so projects render can call after appending cards.
-    window.__decryptObserveAll = observeAll;
-    observeAll();
-  })();
-
-  // ============ CLOCK ============
-  (function () {
-    const el = document.getElementById('clock');
-    function pad(n){ return String(n).padStart(2,'0'); }
-    function tick() {
-      const d = new Date();
-      el.textContent = `T+ ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())} UTC`;
-    }
-    tick(); setInterval(tick, 1000);
-  })();
-
-  // ============ TYPEWRITER TERMINAL ============
-  (function () {
-    const out = document.getElementById('termOut');
-    const lines = [
-      { prompt: '$', text: 'whoami' },
-      { text: 'Hi, I\u2019m Vesa, a solution architect from Finland.' },
-      { text: '' },
-      { prompt: '$', text: 'cat ./bio.txt' },
-      { text: 'For many years I\u2019ve worked across Finnish finance and insurance, on' },
-      { text: 'internet banking, system integrations, and various enterprise systems.' },
-      { text: '' },
-      { text: 'Current focus: legacy modernization, performance, AI-assisted' },
-      { text: 'engineering, and integrating LLMs into existing systems.' },
-      { prompt: '$', text: '', cursor: true }
-    ];
-
-    const termFragment = document.createDocumentFragment();
-    const rowEls = lines.map((ln) => {
-      const row = document.createElement('div');
-      row.className = 'terminal-line';
-      let promptEl = null;
-      if (ln.prompt) {
-        promptEl = document.createElement('span');
-        promptEl.className = 'terminal-prompt';
-        promptEl.textContent = ln.prompt + ' ';
-        // Keep the prompt's space reserved but invisible until this line's turn —
-        // a fresh terminal shouldn't already have a wall of $ signs.
-        promptEl.style.visibility = 'hidden';
-        row.appendChild(promptEl);
-      } else {
-        const indent = document.createElement('span');
-        indent.style.color = 'var(--fg-faint)';
-        indent.textContent = '  ';
-        row.appendChild(indent);
-      }
-      const span = document.createElement('span');
-      row.appendChild(span);
-      // Reserve baseline height for empty lines too (so the box keeps its
-      // shape even before any typing has reached them).
-      if (!ln.text && !ln.prompt) {
-        const ghost = document.createElement('span');
-        ghost.textContent = '\u00A0';
-        ghost.style.visibility = 'hidden';
-        row.appendChild(ghost);
-      }
-      termFragment.appendChild(row);
-      return { row, span, promptEl };
-    });
-    out.appendChild(termFragment);
-
-    let lineIdx = 0;
-    let charIdx = 0;
-
-    function nextLine() {
-      if (lineIdx >= lines.length) return;
+    while (lineIdx < lines.length) {
       const ln = lines[lineIdx];
       const row = rowEls[lineIdx];
-      if (row.promptEl) row.promptEl.style.visibility = 'visible';
-      charIdx = 0;
-      typeChar(ln);
-    }
+      const charCost = ln.prompt ? PROMPT_CHAR : BODY_CHAR;
 
-    function typeChar(ln) {
-      const target = rowEls[lineIdx].span;
       if (charIdx < ln.text.length) {
-        target.textContent += ln.text[charIdx++];
-        const delay = ln.prompt ? 38 : (Math.random() * 10 + 8);
-        setTimeout(() => typeChar(ln), delay);
-      } else {
-        if (ln.cursor) {
-          const c = document.createElement('span');
-          c.className = 'terminal-cursor';
-          target.appendChild(c);
-        }
-        lineIdx++;
-        setTimeout(nextLine, ln.prompt ? 250 : 60);
+        if (credit < charCost) break;
+        if (charIdx === 0 && row.promptEl) row.promptEl.style.visibility = 'visible';
+        credit -= charCost;
+        row.span.textContent += ln.text[charIdx++];
+        continue;
       }
+
+      // Line finished: pay the end-of-line pause, then advance.
+      const pause = ln.prompt ? PROMPT_PAUSE : BODY_PAUSE;
+      if (credit < pause) break;
+      credit -= pause;
+      if (row.promptEl) row.promptEl.style.visibility = 'visible';
+      if (ln.cursor) addCursor(lineIdx);
+      lineIdx++;
+      charIdx = 0;
     }
 
-    setTimeout(nextLine, 600);
-  })();
+    if (lineIdx < lines.length) requestAnimationFrame(frame);
+    else clearTimeout(bail);
+  }
 
-  // ============ PROJECTS ============
-  (function () {
-    const data = JSON.parse(document.getElementById('projects-data').textContent);
-    const grid = document.getElementById('projectsGrid');
+  requestAnimationFrame(frame);
+})();
 
-    const fragment = document.createDocumentFragment();
-    data.forEach((p) => {
-      const card = document.createElement('article');
-      card.className = 'project-card';
-      card.innerHTML = `
-        <div class="project-img-wrap">
-          <img src="${p.img}" alt="Screenshot of ${p.title}" loading="lazy" width="800" height="450" />
-          <div class="project-img-overlay"></div>
-          <div class="project-img-corners"><span></span></div>
-          <div class="project-id">PRJ-${p.id}</div>
+// ============ PROJECTS ============
+(function () {
+  const dataEl = document.getElementById('projects-data');
+  const grid = document.getElementById('projectsGrid');
+  if (!dataEl || !grid) return;
+
+  const data = JSON.parse(dataEl.textContent);
+  const fragment = document.createDocumentFragment();
+
+  data.forEach((p) => {
+    const card = document.createElement('article');
+    card.className = 'project-card';
+    card.innerHTML = `
+      <div class="project-img-wrap">
+        <img src="${p.img}" alt="Screenshot of ${p.title}" loading="lazy" width="480" height="480"${p.pos ? ` style="object-position:${p.pos}"` : ''} />
+      </div>
+      <div class="project-body">
+        <div class="project-stack">
+          ${p.stack.map(s => `<span class="stack-tag">${s}</span>`).join('')}
         </div>
-        <div class="project-body">
-          <div class="project-stack">
-            ${p.stack.map(s => `<span class="stack-tag">${s}</span>`).join('')}
+        <h3 class="project-title">${p.title}</h3>
+        <p class="project-desc">${p.desc}</p>
+        <p class="project-why"><span class="label">Why</span>${p.why}</p>
+        ${p.links.length ? `
+          <div class="project-links">
+            ${p.links.map(l => `<a href="${l.href}" target="_blank" rel="noopener">${l.text} ↗</a>`).join('')}
           </div>
-          <h3 class="project-title">${p.title}</h3>
-          <p class="project-desc">${p.desc}</p>
-          <p class="project-why"><span class="label">// why</span>${p.why}</p>
-          ${p.links.length ? `
-            <div class="project-links">
-              ${p.links.map(l => `<a href="${l.href}" target="_blank" rel="noopener"><span class="label">${l.label}:</span>${l.text} ↗</a>`).join('')}
-            </div>
-          ` : ''}
-        </div>
-      `;
-      fragment.appendChild(card);
-    });
-    grid.appendChild(fragment);
+        ` : ''}
+      </div>
+    `;
+    fragment.appendChild(card);
+  });
 
-    // Now that .project-title nodes exist, ask the decrypt observer to pick them up.
-    if (typeof window.__decryptObserveAll === 'function') {
-      window.__decryptObserveAll();
-    }
-  })();
-
-  // ============ DATASTREAM (continuous calm binary flow) ============
-  // The stream encodes a real ASCII message, 8 bits per byte, grouped by &nbsp;.
-  // Decode any 8-bit chunk to read it back.
-  (function () {
-    const flow = document.querySelector('.datastream-flow');
-    if (!flow) return;
-
-    const SOURCE =
-      'VESA SAARINEN // SOLUTION ARCHITECT // ' +
-      'LEGACY MODERNIZATION // AI-ASSISTED ENGINEERING // LLM INTEGRATION // PERFORMANCE // ' +
-      'JDBC LENS // COBOL TO JAVA // ARCH AUDIT // ' +
-      'OMASTOPPI // ECONSTATS // JAVARAYS // ' +
-      'HELSINKI FINLAND // VESAS.FI // ';
-
-    // ASCII -> 8-bit binary string
-    function toBits(s) {
-      let out = '';
-      for (let i = 0; i < s.length; i++) {
-        out += s.charCodeAt(i).toString(2).padStart(8, '0');
-      }
-      return out;
-    }
-
-    // Style each bit (occasional accent color), group every 8 bits with a space.
-    function styleBits(bits) {
-      let out = '';
-      for (let i = 0; i < bits.length; i++) {
-        const bit = bits[i];
-        const r = Math.random();
-        if (r < 0.025)     out += '<span class="hi">' + bit + '</span>';
-        else if (r < 0.045) out += '<span class="mg">' + bit + '</span>';
-        else if (r < 0.09)  out += '<span class="br">' + bit + '</span>';
-        else                out += bit;
-        if ((i + 1) % 8 === 0) out += '&nbsp;';
-      }
-      return out;
-    }
-
-    const styled = styleBits(toBits(SOURCE));
-    // Duplicate for seamless loop (animation translates -50%).
-    flow.innerHTML = styled + styled;
-  })();
-
-  // ============ TICKER ============
-  (function () {
-    const items = [
-      ['CPU', '0.42', 'cyan'],
-      ['MEM', '6.1G', 'cyan'],
-      ['NET', 'UP', 'lime'],
-      ['REGION', 'EU-NORTH-1', 'cyan'],
-      ['STACK', 'JAVA · PYTHON · TS', 'cyan'],
-      ['BUILDS', '142/142', 'lime'],
-      ['LATENCY', '12ms', 'lime'],
-      ['UPLINK', 'STABLE', 'lime'],
-      ['NODE', 'HEL-01', 'cyan'],
-      ['MODE', 'PUBLIC', 'magenta'],
-      ['VERSION', '3.0.26', 'cyan'],
-      ['LAST_PUSH', '04:12 UTC', 'cyan']
-    ];
-    const track = document.getElementById('tickerTrack');
-    const html = items.map(([k, v, c]) =>
-      `<span class="ticker-item"><span class="dot"></span>${k} <span class="${c}">${v}</span></span>`
-    ).join('');
-    track.innerHTML = html + html;
-  })();
+  grid.appendChild(fragment);
+})();
