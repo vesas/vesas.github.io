@@ -133,7 +133,7 @@
   const data = JSON.parse(dataEl.textContent);
   const fragment = document.createDocumentFragment();
 
-  data.forEach((p, i) => {
+  data.forEach(p => {
     // The title carries the primary link where there is one. Projects with
     // nothing to link to stay plain text rather than pretending otherwise.
     const primary = p.links[0];
@@ -146,7 +146,6 @@
 
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td class="c-num">${String(i + 1).padStart(2, '0')}</td>
       <td class="c-name">${name}</td>
       <td class="c-stack">${p.stack.join(' · ')}</td>
       <td class="c-desc">${p.short}</td>
