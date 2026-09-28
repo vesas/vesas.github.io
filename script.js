@@ -13,9 +13,6 @@
     { prompt: '$', text: 'cat ./bio.txt' },
     { text: 'For many years I’ve worked across Finnish finance and insurance, on' },
     { text: 'internet banking, system integrations, and various enterprise systems.' },
-    { text: '' },
-    { text: 'Current focus: hands-on legacy modernization, performance,' },
-    { text: 'AI-assisted engineering, and integrating LLMs into existing systems.' },
     { prompt: '$', text: '', cursor: true }
   ];
 
